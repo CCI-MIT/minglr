@@ -173,6 +173,10 @@ main {
         display: flex;
         align-items: center;
         margin-bottom: 1rem;
+        position: sticky;
+        top: 0;
+        background-color: white;
+        z-index: 88;
         img {
             width: 26px
         }

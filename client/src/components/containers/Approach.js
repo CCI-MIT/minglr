@@ -210,7 +210,7 @@ class Approach extends React.Component {
                         const newUsers = users.filter((u, i) => i !== index)
                         const newUser = {
                             ...selected,
-                            following: data.following !== "unfollowing",
+                            following: (data.following && data.following !== "unfollowing"),
                             matched: (data.matched && data.matched !== "unmatched") || data.user.matched,
                         };
 

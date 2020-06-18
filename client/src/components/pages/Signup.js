@@ -114,6 +114,7 @@ function Signup(props) {
                         type="password" 
                         required
                         placeholder="Password"/>
+                        * Password should be longer than 8 letters
                 <input onChange={onPasswordConfirmHandler}
                         id="passwordConfirm"
                         type="password" 

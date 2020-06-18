@@ -1,0 +1,6 @@
+.env
+/node_modules
+server.crt
+server.csr
+server.key
+minglr_us.crt

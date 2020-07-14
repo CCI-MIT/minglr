@@ -60,6 +60,7 @@ class Show extends React.Component{
             <div className="user_data">
                 <div className="show">
                     <div className="user_close" onClick={handleClose}>close X</div>
+                    
                     <div className="user_list">
                         <img src={(user.image) ? user.image : require("../../images/default_user.jpeg")} alt={user.firstname} />
                         <h3>{user.firstname} {user.lastname}</h3>

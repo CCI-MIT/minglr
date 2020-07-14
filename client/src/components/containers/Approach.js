@@ -148,6 +148,139 @@ class Approach extends React.Component {
         this._isMounted = false;
     }
 
+    addUser(data) {
+        const { users } = this.state;
+        const index = this.state.users.findIndex(u => u._id === data.user._id)
+        if (index < 0) {
+            const newUser = data.user;
+
+            if (data.following === "following") {
+                newUser.following = true;
+                this.setState(prevState => ({
+                    ...prevState,
+                    users: [newUser, ...prevState.users],
+                }));
+            }
+            else {
+                this.setState(prevState => ({
+                    ...prevState,
+                    users: [...prevState.users, newUser],
+                }));
+            }
+        }
+        else if (data.following === "unfollowing" || data.matched === "unmatched") {
+            const selected = users[index];
+            const newUsers = users.filter((u, i) => i !== index)
+            const newUser = {
+                ...selected,
+                following: (data.following && data.following !== "unfollowing"),
+                matched: (data.matched && data.matched !== "unmatched") || data.user.matched,
+            };
+
+            this.setState(prevState => ({
+                ...prevState,
+                users: [...newUsers, newUser],
+            }))
+        }
+    }
+
+    removeUser(data) {
+        const newUsers = this.state.users.filter(u => u.id !== data.user_id);
+        if (this.state.users.length > newUsers.length) {
+            this.setState(prevState => ({
+                ...prevState,
+                users: newUsers,
+            }))
+        }
+        else {
+            setTimeout(() => {
+                this.setState(prevState => ({
+                    ...prevState,
+                    users: prevState.users.filter(u => u.id !== data.user_id),
+                }))
+            }, 2000);
+        }
+    }
+
+    updateUser(data) {
+        const { users } = this.state; 
+        const index = users.findIndex(u => u._id === data._id);
+        if (index >= 0) {
+            const selected = users[index];
+            const nextUsers = [...users];
+            
+            nextUsers[index] = {
+                ...selected,
+                firstname: data.firstname,
+                lastname: data.lastname,
+                affiliation: data.affiliation,
+                keywords: data.keywords,
+            };
+
+            this.setState(prevState => ({
+                ...prevState,
+                users: nextUsers,
+            }))
+        }
+    }
+
+    updateUserImage(data) {
+        const { users } = this.state; 
+        const index = users.findIndex(u => u._id === data._id);
+        if (index >= 0) {
+            const selected = users[index];
+            const nextUsers = [...users];
+            
+            nextUsers[index] = {
+                ...selected,
+                image: data.image,
+            };
+
+            this.setState(prevState => ({
+                ...prevState,
+                users: nextUsers,
+            }))
+        }
+    }
+
+    matchUser(data) {
+        const { users } = this.state;
+        const index = users.findIndex(u => u._id === data._id);
+        if (index >= 0) {
+            const selected = users[index];
+            const nextUsers = [...users];
+            
+            nextUsers[index] = {
+                ...selected,
+                matched: true,
+            };
+
+            this.setState(prevState => ({
+                ...prevState,
+                users: nextUsers,
+            }))
+        }
+    }
+
+    unmatchUser(data) {
+        const { users } = this.state;
+        const index = users.findIndex(u => u._id === data._id);
+        if (index >= 0) {
+            const selected = users[index];
+            const nextUsers = [...users];
+            
+            nextUsers[index] = {
+                ...selected,
+                matched: false,
+            };
+
+            this.setState(prevState => ({
+                ...prevState,
+                users: nextUsers,
+            }))
+        }
+    }
+
     componentDidMount() {
         this._isMounted = true;
         const { socket } = this.props;
@@ -156,134 +289,18 @@ class Approach extends React.Component {
         if (this._isMounted) {
             socket.on("approach", data => {
                 console.log(data);
-                if (data.type === "ADD") {
-                    const { users } = this.state;
-                    const index = this.state.users.findIndex(u => u._id === data.user._id)
-                    if (index < 0) {
-                        console.log(this.state.users);
-                        const newUser = data.user;
-
-                        if (data.following === "following") {
-                            newUser.following = true;
-                            this.setState(prevState => ({
-                                ...prevState,
-                                users: [newUser, ...prevState.users],
-                            }));
-                        }
-                        else {
-                            this.setState(prevState => ({
-                                ...prevState,
-                                users: [...prevState.users, newUser],
-                            }));
-                        }
-                    }
-                    else if (data.following === "unfollowing" || data.matched === "unmatched") {
-                        const selected = users[index];
-                        const newUsers = users.filter((u, i) => i !== index)
-                        const newUser = {
-                            ...selected,
-                            following: (data.following && data.following !== "unfollowing"),
-                            matched: (data.matched && data.matched !== "unmatched") || data.user.matched,
-                        };
-
-                        this.setState(prevState => ({
-                            ...prevState,
-                            users: [...newUsers, newUser],
-                        }))
-                    }
-                }
-                else if (data.type === "REMOVE") {
-                    const newUsers = this.state.users.filter(u => u.id !== data.user_id);
-                    if (this.state.users.length > newUsers.length) {
-                        this.setState(prevState => ({
-                            ...prevState,
-                            users: newUsers,
-                        }))
-                    }
-                    else {
-                        setTimeout(() => {
-                            this.setState(prevState => ({
-                                ...prevState,
-                                users: prevState.users.filter(u => u.id !== data.user_id),
-                            }))
-                        }, 2000);
-                    }
-                }
-                else if (data.type === "UPDATE") {
-                    const { users } = this.state; 
-                    const index = users.findIndex(u => u._id === data._id);
-                    if (index >= 0) {
-                        const selected = users[index];
-                        const nextUsers = [...users];
-                        
-                        nextUsers[index] = {
-                            ...selected,
-                            firstname: data.firstname,
-                            lastname: data.lastname,
-                            affiliation: data.affiliation,
-                            keywords: data.keywords,
-                        };
-
-                        this.setState(prevState => ({
-                            ...prevState,
-                            users: nextUsers,
-                        }))
-                    }
-                }
-                else if (data.type === "UPDATE_IMAGE") {
-                    const { users } = this.state; 
-                    const index = users.findIndex(u => u._id === data._id);
-                    if (index >= 0) {
-                        const selected = users[index];
-                        const nextUsers = [...users];
-                        
-                        nextUsers[index] = {
-                            ...selected,
-                            image: data.image,
-                        };
-
-                        this.setState(prevState => ({
-                            ...prevState,
-                            users: nextUsers,
-                        }))
-                    }
-                }
-                else if (data.type === "MATCHED") {
-                    const { users } = this.state;
-                    const index = users.findIndex(u => u._id === data._id);
-                    if (index >= 0) {
-                        const selected = users[index];
-                        const nextUsers = [...users];
-                        
-                        nextUsers[index] = {
-                            ...selected,
-                            matched: true,
-                        };
-
-                        this.setState(prevState => ({
-                            ...prevState,
-                            users: nextUsers,
-                        }))
-                    }
-                }
-                else if (data.type === "UNMATCHED") {
-                    const { users } = this.state;
-                    const index = users.findIndex(u => u._id === data._id);
-                    if (index >= 0) {
-                        const selected = users[index];
-                        const nextUsers = [...users];
-                        
-                        nextUsers[index] = {
-                            ...selected,
-                            matched: false,
-                        };
-
-                        this.setState(prevState => ({
-                            ...prevState,
-                            users: nextUsers,
-                        }))
-                    }
-                }
+                if (data.type === "ADD")
+                    this.addUser(data);
+                else if (data.type === "REMOVE")
+                    this.removeUser(data);
+                else if (data.type === "UPDATE")
+                    this.updateUser(data);
+                else if (data.type === "UPDATE_IMAGE")
+                    this.updateUserImage(data);
+                else if (data.type === "MATCHED")
+                    this.matchUser(data);
+                else if (data.type === "UNMATCHED")
+                    this.unmatchUser(data);
             });
         }
 

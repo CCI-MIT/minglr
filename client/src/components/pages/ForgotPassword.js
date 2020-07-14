@@ -14,6 +14,7 @@ function ForgotPassword(props) {
 
     const resetPasswordHandler = async (e) => {
         e.preventDefault();
+        
         if (Email.length === 0) {
             setMessage("Please enter your email")
         }

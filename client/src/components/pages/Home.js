@@ -53,6 +53,7 @@ class Home extends React.Component {
             
             this.api = new window.JitsiMeetExternalAPI(domain, options);
 
+            // add listener 
             this.api.addEventListener('videoConferenceJoined', () => {
                 this.setState(prevState => ({
                     ...prevState,
@@ -63,9 +64,6 @@ class Home extends React.Component {
                     this.api.executeCommand('displayName', myName);
                 });
             });
-            this.api.addEventListener("participantJoined", () => {
-                console.log(this.api.getNumberOfParticipants());
-            })
             this.api.addEventListener("participantLeft", async (data) => {
                 console.log(data)
                 if (!this._isFinished) {
@@ -73,8 +71,6 @@ class Home extends React.Component {
                     axios.get("/api/finish").then(() => {
                         this._isFinished = false;
                     });
-                    // const { socket } = this.props;
-                    // socket.emit("finish");
 
                     localStorage.setItem("mode", "finished")
                     localStorage.setItem("room", "")
@@ -127,10 +123,7 @@ class Home extends React.Component {
         await axios.get("/api/proceed");
     }
 
-    // handleFinish = async () => {
-    //     await axios.get("/api/finish");
-    // }
-
+    // finishee
     handleFinishConfirm = () => {
         console.log("handleFinishConfirm")
         localStorage.setItem("mode", "")

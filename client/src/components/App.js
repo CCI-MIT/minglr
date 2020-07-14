@@ -10,10 +10,6 @@ import ResetPassword from "./pages/ResetPassword";
 import { positions, Provider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
 
-import Policy from "./static/Policy";
-import Terms from "./static/Terms";
-import Support from "./static/Support";
-
 const options = {
   timeout: 5000,
   position: positions.TOP_RIGHT,
@@ -37,9 +33,6 @@ function App() {
           <Route exact path="/forgotpassword" component={Auth(ForgotPassword, false)} />
           <Route path="/resetpassword/:token" component={Auth(ResetPassword, false)} />
 
-          <Route exact path="/policy" component={Policy} />
-          <Route exact path="/terms" component={Terms} />
-          <Route exact path="/support" component={Support} />
         </Switch>
       </Provider>
     </Suspense>

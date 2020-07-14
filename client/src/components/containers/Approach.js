@@ -8,8 +8,6 @@ import Loader from "../commons/Loader";
 import Search from "../approach/Search";
 
 
-let typingTimer;                //timer identifier
-
 class Approach extends React.Component { 
     _isMounted = false;
 

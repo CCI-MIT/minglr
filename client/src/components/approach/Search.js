@@ -1,6 +1,10 @@
 import React from "react";
+import axios from 'axios'
 
 function Search(props) {
+
+    let typingTimer;                //timer identifier
+
     const searchHandler = (e) => {
         let value = e.target.value.toLowerCase().replace(/\s+/g, " ");
         let queries = value.split(" ");

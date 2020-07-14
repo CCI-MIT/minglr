@@ -1,9 +1,12 @@
 import React from "react";
-import User from "../commons/User";
 import axios from 'axios'
-import Show from './Show';
-import Loader from "../commons/Loader";
 import Cookies from 'js-cookie';
+
+import Show from './Show';
+import User from "../commons/User";
+import Loader from "../commons/Loader";
+import Search from "../approach/Search";
+
 
 let typingTimer;                //timer identifier
 
@@ -143,35 +146,6 @@ class Approach extends React.Component {
         }
     }
 
-    searchHandler = (e) => {
-        let value = e.target.value.toLowerCase().replace(/\s+/g, " ");
-        let queries = value.split(" ");
-        Array.from(document.querySelectorAll(".searchable .user_info")).forEach(function(ele) {
-            let count = 0;
-            queries.forEach(function(query) {
-                if (ele.innerText.toLowerCase().includes(query))
-                    count += 1;
-            });
-
-            if (count === queries.length)
-                ele.parentElement.parentElement.classList.remove("invisible");
-            else
-                ele.parentElement.parentElement.classList.add("invisible");
-        });
-    }
-
-    keyUpHandler = (e) => {
-        clearTimeout(typingTimer);
-        let val = e.target.value
-        if (val) {
-            typingTimer = setTimeout(function() {
-                //do something
-                axios.post('/api/search', {value: val}).then(response => {
-                    console.log(response);
-                })
-            }, 5000);
-        }
-    }
     componentWillUnmount() {
         this._isMounted = false;
     }
@@ -327,10 +301,7 @@ class Approach extends React.Component {
                     <>
                     <div className="user_list searchable">
                         <h2>I'd like to talk to...</h2>
-                        <div className="search-container">
-                            <img src={require("../../images/search.png")} alt="search"/>
-                            <input id="search" onChange={this.searchHandler} onKeyUp={this.keyUpHandler}/>
-                        </div>
+                        <Search/>
                         {users.map(this.renderUsers)}
                     </div>
                     {selectedUser.id < 0 ? 

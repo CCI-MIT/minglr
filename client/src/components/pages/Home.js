@@ -12,20 +12,13 @@ class Home extends React.Component {
     _isMounted = false;
     _isFinished = false;
     api = null;
-    participantNum = 0;
 
     constructor(props) {
         super(props);
-        let name = localStorage.getItem("name") && localStorage.getItem("name").length > 0;
-        let room = localStorage.getItem("room") && localStorage.getItem("room").length > 0;
         
         this.state = {
             loading: true,
-            modal:  localStorage.getItem("mode") === "modal",
-            cancelled: localStorage.getItem("mode") === "cancelled",
-            finished: localStorage.getItem("mode") === "finished",
-            waiting: localStorage.getItem("mode") === "waiting",
-            call: name && room,
+            mode: localStorage.getItem("mode") || "",
         };
     }
     startConference = () => {
@@ -64,47 +57,13 @@ class Home extends React.Component {
                     this.api.executeCommand('displayName', myName);
                 });
             });
-            this.api.addEventListener("participantLeft", async (data) => {
-                console.log(data)
-                if (!this._isFinished) {
-                    this._isFinished = true;
-                    axios.get("/api/finish").then(() => {
-                        this._isFinished = false;
-                    });
-
-                    localStorage.setItem("mode", "finished")
-                    localStorage.setItem("room", "")
-                    if (this.api) this.api.dispose();
-
-                    this.setState(prevState => ({
-                        ...prevState,
-                        call: false,
-                        modal: false,
-                        finished: true,
-                    }));
-                }
+            this.api.addEventListener("participantLeft", async () => {
+                console.log("participantLeft")
+                this.handleFinish();
             });
-            this.api.addEventListener("videoConferenceLeft", async (data) => {
+            this.api.addEventListener("videoConferenceLeft", async () => {
                 console.log("videoConferenceLeft");
-                if (!this._isFinished) {
-                    axios.get("/api/finish").then(() => {
-                        this._isFinished = false;
-                    });
-                    // const { socket } = this.props;
-                    // socket.emit("finish");
-
-                    localStorage.setItem("mode", "finished")
-                    localStorage.setItem("room", "")
-                    if (this.api) this.api.dispose();
-
-                    this.setState(prevState => ({
-                        ...prevState,
-                        call: false,
-                        modal: false,
-                        finished: true,
-                    }));
-                }
-                
+                this.handleFinish();
             });
         } catch (err) { console.error(err); }
     }
@@ -114,8 +73,7 @@ class Home extends React.Component {
 
         this.setState(prevState => ({
             ...prevState,
-            modal: false,
-            call: true,
+            mode: "call"
         }), () => {
             this.startConference();
         });
@@ -123,35 +81,62 @@ class Home extends React.Component {
         await axios.get("/api/proceed");
     }
 
+    // finisher
+    handleFinish = () => {
+        console.log("handleFinish")
+
+        if (!this._isFinished) {
+            this._isFinished = true;
+            
+            axios.get("/api/finish").then(() => {
+                this._isFinished = false;
+            });
+
+            // update localstorage
+            localStorage.setItem("mode", "finished")
+            localStorage.setItem("room", "")
+
+            if (this.api) this.api.dispose();
+
+            // update state
+            this.setState(prevState => ({
+                ...prevState,
+                mode: "finished"
+            }));
+        }
+    }
+
     // finishee
     handleFinishConfirm = () => {
         console.log("handleFinishConfirm")
+
+        // update localstorage
         localStorage.setItem("mode", "")
         localStorage.setItem("name", "")
         
+        // update state
         this.setState(prevState => ({
             ...prevState,
-            modal: false,
-            call: false,
-            finished: false,
+            mode: "",
         }));
     }
 
     // canceller
     handleCancel = async () => {
-        const { modal, waiting } = this.state;
-        if ((modal || waiting) && !this._isWaiting) {
+        const { mode } = this.state;
+        if ((mode === "modal" || mode === "waiting") && !this._isWaiting) {
             this._isWaiting = true;
             await axios.get("/api/cancel").then(response => {
                 console.log(response);
+
+                // update localstorage
                 localStorage.setItem("mode", "")
                 localStorage.setItem("room", "")
 
+                // update state
                 this.setState(prevState => ({
                     ...prevState,
-                    modal: false,
-                    call: false,
-                    waiting: false,
+                    mode: "",
                 }));
                 this._isWaiting = false;
             })
@@ -160,29 +145,25 @@ class Home extends React.Component {
 
     // cancellee
     handleCancelConfirm = async () => {
-        const { cancelled, call } = this.state;
-        if (cancelled || call) {
+        const { mode } = this.state;
+        if (mode === "cancelled" || mode === "call") {
             await axios.get("/api/cancel_confirm").then(response => {
                 console.log(response);
 
+                // update localstorage
                 localStorage.setItem("mode", "")
                 localStorage.setItem("room", "")
                 localStorage.setItem("name", "")
 
+                // update state
                 this.setState(prevState => ({
                     ...prevState,
-                    cancelled: false,
-                    call: false,
-                    waiting: false,
-                    modal: false,
+                    mode: "",
                 }));
-                console.log(this.state);
-
             })
         }
     }
     componentWillUnmount() {
-        const { call } = this.state;
         this._isMounted = false;
 
         window.addEventListener("beforeunload", async function (e) {
@@ -191,16 +172,9 @@ class Home extends React.Component {
             // Chrome requires returnValue to be set
             e.returnValue = '';
 
-            if (call && this._isFinished) {
-                axios.get("/api/finish").then(() => {
-                    this._isFinished = false;
-                })
-                // socket.emit("finish");
-
-                localStorage.setItem("mode", "finished")
-                localStorage.setItem("room", "")
-                this.api.executeCommand('hangup');
-                this.api.dispose();
+            if (this.state.mode === "call") {
+                if (this.api) this.api.executeCommand('hangup');
+                this.handleFinish();
             }
 
             await axios.get("/api/unavailable");
@@ -211,7 +185,7 @@ class Home extends React.Component {
         this._isMounted = true;
 
         const { socket } = this.props;
-        const { call, modal, cancelled } = this.state;
+        const { mode } = this.state;
 
         if (this._isMounted) {
 
@@ -221,44 +195,25 @@ class Home extends React.Component {
                 // Chrome requires returnValue to be set
                 e.returnValue = '';
 
-                if (call && this._isFinished) {
-                    axios.get("/api/finish").then(() => {
-                        this._isFinished = false;
-                    })
-                    // socket.emit("finish");
-
-                    localStorage.setItem("mode", "finished")
-                    localStorage.setItem("room", "")
-                    this.api.executeCommand('hangup');
-                    this.api.dispose();
+                if (this.state.mode === "call") {
+                    if (this.api) this.api.executeCommand('hangup');
+                    this.handleFinish();
                 }
-
+    
                 await axios.get("/api/unavailable");
             });
             
-            if (call && !modal && !cancelled) {
+            if (mode === "call") {
                 this.startConference();
             }
 
             socket.on("finishCall", async () => {
-                // const { socket } = this.props;
-                // socket.emit("finish");
-                localStorage.setItem("mode", "finished")
-                localStorage.setItem("room", "")
-                if (this.api) this.api.dispose();
-
-                this.setState(prevState => ({
-                    ...prevState,
-                    waiting: false,
-                    call: false,
-                    modal: false,
-                    finished: true,
-                }));
-
-                await axios.get("/api/finish");
+                // call -> finished
+                this.handleFinish();
             })
 
             socket.on("cancelled", () => {
+                // waiting -> cancelled
                 console.log("cancelled")
 
                 localStorage.setItem("mode", "cancelled")
@@ -266,20 +221,20 @@ class Home extends React.Component {
 
                 this.setState(prevState => ({
                     ...prevState,
-                    cancelled: true,
+                    mode: "cancelled"
                 }));
             })
+
             socket.on("createCall", () => {
                 console.log("createCall")
                 // waiting -> call
                 // modal -> call
-                const { call } = this.state;
+                const { mode } = this.state;
                 try {
-                    if (!call && window.JitsiMeetExternalAPI) {
+                    if (mode !== "call" && window.JitsiMeetExternalAPI) {
                         this.setState(prevState => ({
                             ...prevState,
-                            waiting: false,
-                            call: true,
+                            mode: "call",
                         }), () => {
                             this.startConference();
                         });
@@ -289,6 +244,7 @@ class Home extends React.Component {
             });
 
             socket.on("joinCall", data => {
+                // request -> other things -> modal
                 console.log(data)
 
                 localStorage.setItem("name", data.name);
@@ -297,7 +253,7 @@ class Home extends React.Component {
 
                 this.setState(prevState => ({
                     ...prevState,
-                    modal: true,
+                    mode: "modal",
                 }));
 
                 // click on approach tab
@@ -306,6 +262,7 @@ class Home extends React.Component {
             });
 
             socket.on("waitCall", data => {
+                // accept request -> waiting
                 console.log(data)
                 const { waiting } = this.state
                 try {
@@ -316,7 +273,7 @@ class Home extends React.Component {
 
                         this.setState(prevState => ({
                             ...prevState,
-                            waiting: true,
+                            mode: "waiting",
                         }));
 
                         // click on approach tab
@@ -333,30 +290,32 @@ class Home extends React.Component {
     }
 
     render () {
-        const { call, modal, cancelled, finished, loading, waiting } = this.state;
+        const { loading, mode } = this.state;
         let returnThis = ""
 
         console.log(this.state);
-        if (cancelled) {
-            // show modal to alert cancel
-            returnThis = <Modal mode="cancelled" handleCancelConfirm={this.handleCancelConfirm}/>
+        if (mode === "cancelled") {
+            // show modal to inform that the request got canceled
+            returnThis = <Modal mode={mode} handleCancelConfirm={this.handleCancelConfirm}/>
         }
-        else if (finished) {
-            returnThis = <Modal mode="finished" handleFinishConfirm={this.handleFinishConfirm}/>
+        else if (mode === "finished") {
+            // show modal to inform that the call got finished
+            returnThis = <Modal mode={mode} handleFinishConfirm={this.handleFinishConfirm}/>
         }
-        else if (waiting) {
-            returnThis = <Modal mode="waiting" handleCancel={this.handleCancel}/>
+        else if (mode === "waiting") {
+            // waiting for the counterpart to proceed/cancel
+            returnThis = <Modal mode={mode} handleCancel={this.handleCancel}/>
         }
-        else if (call && !modal) {
+        else if (mode === "call") {
             // show the video chat
             returnThis = <div className="jitsi">
                 <strong className="jitsi-loader">{loading ? <div>Waiting for the other...<Loader /></div> : ""}</strong>
                 <div className="jitsi-container" ref="jitsiContainer"></div>
             </div>
         }
-        else if (modal) {
-            //show modal to give choice
-            returnThis = <Modal mode="modal" handleProceed={this.handleProceed} handleCancel={this.handleCancel} />
+        else if (mode === "modal") {
+            // show modal to give choice of proceed/cancel
+            returnThis = <Modal mode={mode} handleProceed={this.handleProceed} handleCancel={this.handleCancel} />
         }
 
         return (
@@ -365,21 +324,20 @@ class Home extends React.Component {
                 <main className="tabPanel-widget">
                     <label className="mobile-nav" htmlFor="tab-1" tabIndex="0"></label>
                     <input className="mobile-nav" id="tab-1" type="radio" name="tabs" defaultChecked aria-hidden="true"/>
-                    <h2 className="mobile-nav" >
-                        {call ? "You're on a call" : "I'd like to talk to"}
+                    <h2 className="mobile-nav">
+                        {mode === "call" ? "You're on a call" : "I'd like to talk to"}
                     </h2>
                     
                     <div className="approach">
                         {returnThis}
                         <Approach {...this.props}/>
                     </div>
-                    
 
                     <label className="mobile-nav" htmlFor="tab-2" tabIndex="0"></label>
                     <input className="mobile-nav" id="tab-2" type="radio" name="tabs" aria-hidden="true"/>
                     <h2 className="mobile-nav" >People who want to talk to you</h2>
 
-                    <Greet {...this.props} clickDisabled={cancelled || modal || call || finished || waiting}/>
+                    <Greet {...this.props} clickDisabled={mode.length > 0}/>
                 </main>
             </div>
         );

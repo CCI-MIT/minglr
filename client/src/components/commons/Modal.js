@@ -10,7 +10,7 @@ function Modal(props) {
     let returnThis = "";
     if (mode === "cancelled") {
         returnThis = <>
-            <b>{name}</b> has cancelled the talk.
+            <b>{name}</b>&nbsp; has cancelled the talk.
             <span className="btn" onClick={handleCancelConfirm}>OK</span>
         </>
     }

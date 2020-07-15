@@ -7,7 +7,6 @@ import User from "../commons/User";
 import Loader from "../commons/Loader";
 import Search from "../approach/Search";
 
-
 class Approach extends React.Component { 
     _isMounted = false;
 
@@ -28,8 +27,7 @@ class Approach extends React.Component {
           }
         };
     }
-
-    // create & destroy wait 
+ 
     follow = async (e, user) => {
         e.preventDefault();
         const { users } = this.state;
@@ -37,7 +35,7 @@ class Approach extends React.Component {
         // set user shown
         this.handleClick(user)
 
-        // create wait
+        // create request
         if (!user.following) {
             
             await axios.post('/api/follow/' + user.id).then(() => {
@@ -65,7 +63,7 @@ class Approach extends React.Component {
         e.preventDefault();
         const { users } = this.state;
 
-        // destroy wait
+        // destroy request
         if (user.following) {
             await axios.delete('/api/unfollow/' + user.id).then((res) => {
                 if (res.data.success) {
@@ -186,10 +184,12 @@ class Approach extends React.Component {
 
     removeUser(data) {
         const newUsers = this.state.users.filter(u => u.id !== data.user_id);
+        const newSelectedUser = (this.state.selectedUser.id === data.user_id) ? {id: -1} : this.state.selectedUser;
         if (this.state.users.length > newUsers.length) {
             this.setState(prevState => ({
                 ...prevState,
                 users: newUsers,
+                selectedUser: newSelectedUser,
             }))
         }
         else {
@@ -197,6 +197,7 @@ class Approach extends React.Component {
                 this.setState(prevState => ({
                     ...prevState,
                     users: prevState.users.filter(u => u.id !== data.user_id),
+                    selectedUser: newSelectedUser,
                 }))
             }, 2000);
         }
@@ -309,6 +310,7 @@ class Approach extends React.Component {
     render() {
         const { currentUser } = this.props;
         const { selectedUser, users, isLoading } = this.state;
+        console.log(users);
 
         return(
             <div className="container absolute">

@@ -235,6 +235,9 @@ main {
             border-radius: 50px;
             overflow: hidden;
             border: 1px solid #c5c5c5;
+            display: flex;
+            align-items: center;
+            background-color: black;
             img {
                 width: 100%;
             }

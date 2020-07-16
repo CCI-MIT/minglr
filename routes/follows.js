@@ -1,20 +1,21 @@
 
 const express = require("express");
+const router = express.Router();
 const ObjectId = require('mongodb').ObjectID;
 
 const { User } = require("../schemas/User");
-const { Log } = require("../schemas/Log");
 
-const router = express.Router();
+const log = require("../libs/log");
+const unfollow = require("../libs/unfollow");
 
 router.delete("/unfollow/:user_id", (req,res) => {
-    const current_id = new ObjectId(req.cookies.w_id);
+    const current_id = req.cookies.w_id;
 
     try {
         User.findOne({id: req.params.user_id}).then(user => {
 
             // check if your id doesn't match the id of the user you want to unfollow
-            if (user._id === current_id) {
+            if (user._id.toString() === current_id) {
                 return res.status(400).json({ success: false, message: 'You cannot unfollow yourself' })
             }
             else {
@@ -22,7 +23,6 @@ router.delete("/unfollow/:user_id", (req,res) => {
                 // first update the list of the other user
                 const io = req.app.get("io"); 
                 User.findById(current_id).then(currentUser => {
-
                     io.to(user._id.toString()).emit("greet", {
                         type: "REMOVE",
                         user_id: currentUser.id,
@@ -33,52 +33,18 @@ router.delete("/unfollow/:user_id", (req,res) => {
                         user: currentUser.getData(),
                         following: "unfollowing",
                     });
-
                 })
 
                 // remove the id of the user you want to unfollow from following array
-                const query = {
-                    _id: current_id
-                }
-
-                const update = {
-                    $pull: { followings: {_id: user._id }}
-                }
-
-                const updated = User.updateOne(query, update, {
-                    safe: true
-                }, function(err, obj) {
-                    if (err) console.error(err);
-                })
-
-                // remove your id from the followers array of the user you want to unfollow
-                const secondQuery = {
-                    _id: user._id
-                }
-
-                const secondUpdate = {
-                    $pull: { followers: {_id: current_id} }
-                }
-
-                User.updateOne(secondQuery, secondUpdate, {
-                    safe: true
-                }, function(err, obj) {
-                    res.status(200).json({
-                        success: true,
-                    })
-
-                    console.log("* UNFOLLOW: unfollowing", user.id, "by", current_id, new Date().toISOString());
-        
-                    const log = new Log({
-                        kind: "UNFOLLOW",
-                        content: user._id,
-                        user: current_id
-                    })
+                unfollow(current_id, user._id);
                 
-                    log.save((err, doc) => {
-                        if (err) console.error(err)
-                    })
+                res.status(200).json({
+                    success: true,
                 })
+
+                // log
+                console.log("* UNFOLLOW: unfollowing", user.id, "by", current_id, new Date().toISOString());
+                log("UNFOLLOW", current_id, user._id);
             }
             
         });
@@ -103,13 +69,13 @@ router.post("/follow/:user_id", (req,res) => {
             User.findOne({id: req.params.user_id}).then(user => {
 
                 // check if the requested user is already in follower list of other user then 
-                if (user.followers.findIndex(follower => follower._id.toString() === current_id) >= 0) {
+                if (user.isFollowedBy(current_id)) {
                     return res.json({ 
                         success: false,
                         message: "You are already waiting for the user"
                     });
                 }
-                else if (user.followings.findIndex(following => following._id.toString() === current_id) >= 0) {
+                else if (user.isFollowing(current_id)) {
                     return res.json({
                         success: false,
                         message: "This user is currently waiting for you. Please look at the right panel."
@@ -126,8 +92,8 @@ router.post("/follow/:user_id", (req,res) => {
                     currentUser: currentUser.getData(),
                 })
 
-                const io = req.app.get("io"); 
                 // update the other user's list
+                const io = req.app.get("io"); 
                 io.to(user._id.toString()).emit("approach", {
                     type: "REMOVE",
                     user_id: currentUser.id,
@@ -137,17 +103,9 @@ router.post("/follow/:user_id", (req,res) => {
                     user: currentUser.getData(),
                 });
 
+                // log
                 console.log("* FOLLOW: following", user.id, "by", current_id, new Date().toISOString());
-
-                const log = new Log({
-                    kind: "FOLLOW",
-                    content: user._id,
-                    user: current_id
-                });
-            
-                log.save((err, doc) => {
-                    if (err) console.error(err)
-                });
+                log("FOLLOW", current_id, user._id);
             })
         })
     } catch (err) {console.error(err)}

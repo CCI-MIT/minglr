@@ -31,54 +31,63 @@ export default function (SpecificComponent, option) {
 
                 //Not Loggined in Status 
                 if (!response.payload.isAuth) {
+                    // redirect to login
                     if (option === true) {
                         props.history.push('/login');
                     }
-                //Loggined in Status 
                 } 
+                //Loggined in Status 
                 else {
-
                     // redirect to home
                     if (option === false) {
                         props.history.push('/home')
                     }
 
-                    localStorage.setItem("my_firstname", response.payload.firstname || "");
-                    localStorage.setItem("my_lastname", response.payload.lastname || "");
-                    localStorage.setItem("affiliation", response.payload.affiliation || "");
-                    localStorage.setItem("keywords", response.payload.keywords || "");
-                    
-                    // show alert if there is no other info
-                    if (!response.payload.affiliation || !response.payload.keywords || !response.payload.image) {
-                        alert.show("Please click on settings (on the top right corner) to edit your information shown to the others");
-                    }
+                    // set local storage based on the auth response
+                    setLocalStorage(response);
 
                     // reconnection and disconnection
-                    socket.on("reconnect", () => {
-                        alert.show("Successfully reconnected");
-                    })
-        
-                    socket.on("clientDisconnect", (data) => {
-                        count += 1;
-                        console.log("disconnected", count);
-                        if (count === 1) {
-                            alert.show('Disconnected. Please refresh your browser if it does not reconnect automatically.')
-                        }
-                        else if (count === 4) {
-                            // window.location.reload();
-                            count = 0;
-                        }
-                    });
+                    handleConnection();
+                    
                 }
 
+                // check if browser is appropriate
                 if (isMobile && !isSafari) {
                     alert.show("The recommended browser on iOS systems is Safari.");
                 }
                 
-                
             })
 
         }, [])
+
+        const setLocalStorage = (response) => {
+            localStorage.setItem("my_firstname", response.payload.firstname || "");
+            localStorage.setItem("my_lastname", response.payload.lastname || "");
+            localStorage.setItem("affiliation", response.payload.affiliation || "");
+            localStorage.setItem("keywords", response.payload.keywords || "");
+            
+            // show alert if there is no other info
+            if (!response.payload.affiliation || !response.payload.keywords || !response.payload.image) {
+                alert.show("Please click on settings (on the top right corner) to edit your information shown to the others");
+            }
+        }
+
+        const handleConnection = () => {
+            socket.on("reconnect", () => {
+                alert.show("Successfully reconnected");
+            })
+
+            socket.on("clientDisconnect", () => {
+                count += 1;
+                console.log("disconnected", count);
+                if (count === 1) {
+                    alert.show('Disconnected. Please refresh your browser if it does not reconnect automatically.')
+                }
+                else if (count === 4) {
+                    count = 0;
+                }
+            });
+        }
 
         return (
             <div>

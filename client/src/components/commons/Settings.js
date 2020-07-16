@@ -3,10 +3,11 @@ import axios from "axios";
 
 function Settings(props) {
 
-    const [firstname, setFirstname] = useState(localStorage.getItem("my_firstname") || "");
-    const [lastname, setLastname] = useState(localStorage.getItem("my_lastname") || "");
-    const [affiliation, setAffiliation] = useState(localStorage.getItem("affiliation") || "");
-    const [keywords, setKeywords] = useState(localStorage.getItem("keywords") || "");
+    const [firstname, setFirstname] = useState(props.currentUser.firstname || "");
+    const [lastname, setLastname] = useState(props.currentUser.lastname || "");
+    const [affiliation, setAffiliation] = useState(props.currentUser.affiliation || "");
+    const [keywords, setKeywords] = useState(props.currentUser.keywords || "");
+    const [image, setImage] = useState(props.currentUser.image || require("../../images/default_user.jpeg"));
     
     const onFirstnameHandler = (event) => {
         setFirstname(event.currentTarget.value)
@@ -28,13 +29,6 @@ function Settings(props) {
         await axios.post("/api/update", data)
         .then(response => {
             console.log(response);
-            localStorage.setItem("my_firstname", firstname);
-            localStorage.setItem("my_lastname", lastname);
-            localStorage.setItem("affiliation", affiliation);
-            localStorage.setItem("keywords", keywords);
-            // if (response.data.success) {
-            //     window.location.reload();
-            // }
             alert("Saved!");
             props.settingsHandler();
         })
@@ -47,13 +41,13 @@ function Settings(props) {
         if (checkFileType(file)) {
             const data = new FormData()
             data.append('image', file);
-            // data.append('file', file);
+            setImage(require("../../images/loader.gif"));
     
-            await axios.post("/api/update_image", data, {
-                // receive two parameters: endpoint url ,form data
-            }).then(response => {
-                if (response.success) {
-                    console.log("profile photo successfully changed");
+            await axios.post("/api/update_image", data).then(response => {
+                console.log(response);
+                // receive two parameters: endpoint url, form data
+                if (response.data.success) {
+                    setImage(response.data.image);
                 }
             })
         }
@@ -82,10 +76,10 @@ function Settings(props) {
     return (
         <div className="settings-body">
             <h3>Your Information</h3>
-            <div>
-                Tell the others about you:
+            <div className="user_image">
+                <img src={image} alt="profile image"/>
             </div>
-            <form action='/api/images' method="post" encType="multipart/form-data">
+            <form>
                 <label className="label">Change Your Profile Image:</label>
                 <input type='file' name='image' onChange={onImageHandler}/>
             </form>

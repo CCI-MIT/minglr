@@ -38,6 +38,7 @@ router.post("/update_image", parser.single("image"), function (req, res) {
             user.save((err, doc) => {
                 res.status(200).json({
                     success: true,
+                    image: req.file.url,
                 });
 
                 const io = req.app.get("io"); 
@@ -62,7 +63,8 @@ router.post("/update_image", parser.single("image"), function (req, res) {
                     })
                 });
             })
-        })
+        });
+        return;
     } catch (err) {console.error(err)}
 });
 

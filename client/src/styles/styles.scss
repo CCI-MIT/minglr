@@ -142,6 +142,19 @@ main {
     font-weight: 600;
     z-index: 900;
 }
+.user_image {
+    width: 42px;
+    height: 40px;
+    border-radius: 50px;
+    overflow: hidden;
+    border: 1px solid #c5c5c5;
+    display: flex;
+    align-items: center;
+    background-color: black;
+    img {
+        width: 100%;
+    }
+}
 .user_list {
     width: 100%;
     height: 100%;
@@ -229,19 +242,7 @@ main {
                 background-color: rgba(#dcd3ff, .7);
             }
         }
-        .user_image {
-            width: 42px;
-            height: 40px;
-            border-radius: 50px;
-            overflow: hidden;
-            border: 1px solid #c5c5c5;
-            display: flex;
-            align-items: center;
-            background-color: black;
-            img {
-                width: 100%;
-            }
-        }
+        
         .user_info {
             width: calc(100% - 50px);
             display: flex;
@@ -363,6 +364,10 @@ nav {
     padding: 1rem;
     z-index: 999;
     border-radius: 0 0 0 10px;
+    .user_image {
+        width: 64px;
+        height: 64px;
+    }
     h3 {
         margin-bottom: 0;
     }

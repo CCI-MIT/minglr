@@ -15,6 +15,14 @@ class Home extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.handleProceed = this.handleProceed.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
+        this.handleCancelConfirm = this.handleCancelConfirm.bind(this);
+        this.handleFinish = this.handleFinish.bind(this);
+        this.handleFinishConfirm = this.handleFinishConfirm.bind(this);
+        this.showJoinCall = this.showJoinCall.bind(this);
+
         
         this.state = {
             loading: true,
@@ -43,6 +51,8 @@ class Home extends React.Component {
                     useStunTurn: true,
                 },
             };
+
+            const { currentUser } = this.props;
             
             this.api = new window.JitsiMeetExternalAPI(domain, options);
 
@@ -53,7 +63,7 @@ class Home extends React.Component {
                     loading: false,
                 }), () => {
                     axios.get("/api/calling");
-                    let myName = localStorage.getItem("my_firstname") + " " + localStorage.getItem("my_lastname");
+                    let myName = currentUser.firstname + " " + currentUser.lastname;
                     this.api.executeCommand('displayName', myName);
                 });
             });
@@ -163,6 +173,22 @@ class Home extends React.Component {
             })
         }
     }
+
+    showJoinCall= (data) => {
+        localStorage.setItem("name", data.name);
+        localStorage.setItem("room", data.room);
+        localStorage.setItem("mode", "modal");
+
+        this.setState(prevState => ({
+            ...prevState,
+            mode: "modal",
+        }));
+
+        // click on approach tab
+        document.getElementById("tab-1").checked = true;
+        document.getElementById("tab-2").checked = false;
+    }
+
     componentWillUnmount() {
         this._isMounted = false;
 
@@ -172,8 +198,8 @@ class Home extends React.Component {
             // Chrome requires returnValue to be set
             e.returnValue = '';
 
-            if (this.state.mode === "call") {
-                if (this.api) this.api.executeCommand('hangup');
+            if (this.api) {
+                this.api.executeCommand('hangup');
                 this.handleFinish();
             }
 
@@ -226,10 +252,11 @@ class Home extends React.Component {
             })
 
             socket.on("createCall", () => {
-                console.log("createCall")
                 // waiting -> call
                 // modal -> call
+                console.log("createCall")
                 const { mode } = this.state;
+
                 try {
                     if (mode !== "call" && window.JitsiMeetExternalAPI) {
                         this.setState(prevState => ({
@@ -243,32 +270,14 @@ class Home extends React.Component {
                 } catch (err) {console.error(err)}
             });
 
-            socket.on("joinCall", data => {
-                // request -> other things -> modal
-                console.log(data)
-
-                localStorage.setItem("name", data.name);
-                localStorage.setItem("room", data.room);
-                localStorage.setItem("mode", "modal");
-
-                this.setState(prevState => ({
-                    ...prevState,
-                    mode: "modal",
-                }));
-
-                // click on approach tab
-                document.getElementById("tab-1").checked = true
-                document.getElementById("tab-2").checked = false
-            });
-
             socket.on("waitCall", data => {
                 // accept request -> waiting
-                console.log(data)
-                const { waiting } = this.state
+                console.log(data);
+                const { mode } = this.state;
                 try {
-                    if (!waiting && window.JitsiMeetExternalAPI) {
-                        localStorage.setItem("name", data.name)
-                        localStorage.setItem("room", data.room)
+                    if (mode !== "waiting" && window.JitsiMeetExternalAPI) {
+                        localStorage.setItem("name", data.name);
+                        localStorage.setItem("room", data.room);
                         localStorage.setItem("mode", "waiting");
 
                         this.setState(prevState => ({
@@ -277,8 +286,8 @@ class Home extends React.Component {
                         }));
 
                         // click on approach tab
-                        document.getElementById("tab-1").checked = true
-                        document.getElementById("tab-2").checked = false
+                        document.getElementById("tab-1").checked = true;
+                        document.getElementById("tab-2").checked = false;
                     }
                     else alert('Please wait for a minute');
 
@@ -330,7 +339,7 @@ class Home extends React.Component {
                     
                     <div className="approach">
                         {returnThis}
-                        <Approach {...this.props}/>
+                        <Approach {...this.props} showJoinCall={this.showJoinCall}/>
                     </div>
 
                     <label className="mobile-nav" htmlFor="tab-2" tabIndex="0"></label>

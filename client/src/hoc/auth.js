@@ -24,8 +24,6 @@ export default function (SpecificComponent, option) {
             //To know my current status, send Auth request 
             dispatch(authUser()).then(response => {
 
-                console.log(response);
-
                 setLoading(false);
                 setUser(response.payload);
 
@@ -43,8 +41,10 @@ export default function (SpecificComponent, option) {
                         props.history.push('/home')
                     }
 
-                    // set local storage based on the auth response
-                    setLocalStorage(response);
+                    // show alert if there is no other info
+                    if (!response.payload.affiliation && !response.payload.keywords) {
+                        alert.show("Please click on settings (on the top right corner) to edit your information shown to the others");
+                    }
 
                     // reconnection and disconnection
                     handleConnection();
@@ -59,18 +59,6 @@ export default function (SpecificComponent, option) {
             })
 
         }, [])
-
-        const setLocalStorage = (response) => {
-            localStorage.setItem("my_firstname", response.payload.firstname || "");
-            localStorage.setItem("my_lastname", response.payload.lastname || "");
-            localStorage.setItem("affiliation", response.payload.affiliation || "");
-            localStorage.setItem("keywords", response.payload.keywords || "");
-            
-            // show alert if there is no other info
-            if (!response.payload.affiliation || !response.payload.keywords || !response.payload.image) {
-                alert.show("Please click on settings (on the top right corner) to edit your information shown to the others");
-            }
-        }
 
         const handleConnection = () => {
             socket.on("reconnect", () => {

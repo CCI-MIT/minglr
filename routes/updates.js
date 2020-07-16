@@ -1,7 +1,6 @@
 const express = require("express");
 
 const { User } = require("../schemas/User");
-const { Log } = require("../schemas/Log");
 
 const router = express.Router();
 
@@ -121,31 +120,30 @@ router.get("/unavailable", (req, res) => {
         const current_id = req.cookies.w_id;
         if (!current_id || current_id === undefined || current_id.length === 0 || current_id === "undefined") return;
         User.findById(current_id).then(currentUser => {
-            currentUser.available = false;
-            currentUser.save((err, doc) => {
-                if (err) console.error(err);
+            currentUser.deactivate();
 
-                const io = req.app.get("io");
-                User.find({}, function(err, allUsers) {
-                    allUsers.forEach((u) => {
-                        const _id = u._id.toString();
-                        if (_id !== current_id) {
-                            if (currentUser.followings.findIndex(f => f._id.toString() === _id) >= 0) {
-                                io.to(_id).emit("greet", {
-                                    type: "REMOVE",
-                                    user_id: currentUser.id,
-                                })
-                            }
-                            else {
-                                io.to(_id).emit("approach", {
-                                    type: "REMOVE",
-                                    user_id: currentUser.id,
-                                })
-                            }
+            const io = req.app.get("io");
+            User.find({}, function(err, allUsers) {
+                allUsers.forEach((u) => {
+                    const _id = u._id.toString();
+                    if (_id !== current_id) {
+                        if (currentUser.isFollowing(_id)) {
+                            io.to(_id).emit("greet", {
+                                type: "REMOVE",
+                                user_id: currentUser.id,
+                            })
                         }
-                    });
+                        else {
+                            io.to(_id).emit("approach", {
+                                type: "REMOVE",
+                                user_id: currentUser.id,
+                            })
+                        }
+                    }
                 });
             });
+
+            currentUser.initialize();
         })
         
     } catch (err) {console.error(err)}

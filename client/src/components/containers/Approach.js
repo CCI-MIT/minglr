@@ -16,6 +16,7 @@ class Approach extends React.Component {
         this.handleClick = this.handleClick.bind(this)
         this.follow = this.follow.bind(this)
         this.unfollow = this.unfollow.bind(this)
+        
         this.state = { 
           isLoading: true,
           users: [],
@@ -28,45 +29,56 @@ class Approach extends React.Component {
         };
     }
  
-    follow = async (e, user) => {
+    follow = (e, user) => {
         e.preventDefault();
         const { users } = this.state;
+        const { socket } = this.props;
 
         // set user shown
         this.handleClick(user)
 
         // create request
         if (!user.following) {
+
+            socket.emit("follow", {
+                user_id: user.id,
+            }, (response) => {
+                if (response.success) {
+                    const index = users.findIndex(u => u.id === user.id);
+                    if (index >= 0) {
+                        const selected = users[index];
+                        const nextUsers = [...users];
             
-            await axios.post('/api/follow/' + user.id).then(() => {
-                const index = users.findIndex(u => u.id === user.id);
-                if (index >= 0) {
-                    const selected = users[index];
-                    const nextUsers = [...users];
+                        nextUsers[index] = { 
+                            ...selected, 
+                            following: true,
+                        };
         
-                    nextUsers[index] = { 
-                        ...selected, 
-                        following: true,
-                    };
-    
-                    this.setState({
-                        isLoading: false,
-                        users: nextUsers,
-                        selectedUser: nextUsers[index]
-                    });
+                        this.setState({
+                            isLoading: false,
+                            users: nextUsers,
+                            selectedUser: nextUsers[index]
+                        });
+                    }
+                }
+                else {
+                    alert(response.message)
                 }
             })
         }
     }
 
-    unfollow = async (e, user) => {
+    unfollow = (e, user) => {
         e.preventDefault();
         const { users } = this.state;
+        const { socket } = this.props;
 
         // destroy request
         if (user.following) {
-            await axios.delete('/api/unfollow/' + user.id).then((res) => {
-                if (res.data.success) {
+            socket.emit("unfollow", {
+                user_id: user.id
+            }, (response) => {
+                if (response.success) {
                     const index = users.findIndex(u => u.id === user.id);
                     if (index >= 0) {
                         const selected = users[index];
@@ -85,7 +97,7 @@ class Approach extends React.Component {
                     }
                 }
                 else {
-                    alert(res.data.message)
+                    alert(response.message)
                 }
             });
         }
@@ -102,8 +114,7 @@ class Approach extends React.Component {
 
     handleClose = () => {
         this.setState(prevState => ({
-            users: [...prevState.users],
-            isLoading: false,
+            ...prevState,
             selectedUser: {
                 id: -1
             },
@@ -140,10 +151,6 @@ class Approach extends React.Component {
                 </div>
             );
         }
-    }
-
-    componentWillUnmount() {
-        this._isMounted = false;
     }
 
     addUser(data) {
@@ -284,7 +291,8 @@ class Approach extends React.Component {
 
     componentDidMount() {
         this._isMounted = true;
-        const { socket } = this.props;
+        const { socket, showJoinCall } = this.props;
+
         this.getUsers();
 
         if (this._isMounted) {
@@ -303,9 +311,20 @@ class Approach extends React.Component {
                 else if (data.type === "UNMATCHED")
                     this.unmatchUser(data);
             });
+
+            socket.on("joinCall", data => {
+                // request -> other things -> modal
+                showJoinCall(data);
+
+                // initialize the show container
+                this.handleClose();
+            });
         }
 
 
+    }
+    componentWillUnmount() {
+        this._isMounted = false;
     }
     render() {
         const { currentUser } = this.props;

@@ -1,6 +1,6 @@
 const { User } = require("../schemas/User");
 
-module.exports = function (follower_id, following_id) { 
+const unfollow = (follower_id, following_id) => { 
     User.updateOne({_id: following_id}, {
         $pull: { 
             followers: {
@@ -21,3 +21,5 @@ module.exports = function (follower_id, following_id) {
         if (err) console.error(err);
     });
 };
+
+module.exports = { unfollow };

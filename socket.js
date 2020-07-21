@@ -142,6 +142,89 @@ module.exports = (server, app) => {
 
                     })
                 } catch (err) {console.error(err);}
+            });
+
+            socket.on("follow", (data, next) => {
+                try {
+                    User.findById(current_id).then(currentUser => {
+                        User.findOne({id: data.user_id}).then(user => {
+            
+                            // check if the requested user is already in follower list of other user then 
+                            if (user.isFollowedBy(current_id)) {
+                                return next({
+                                    success: false,
+                                    message: "You are already waiting for the user"
+                                })
+                            }
+                            else if (user.isFollowing(current_id)) {
+                                return next({
+                                    success: false,
+                                    message: "This user is currently waiting for you. Please look at the right panel."
+                                })
+                            }
+                            // check if the requested user and :user_id is same if same then 
+                            else if (current_id === data.user_id) {
+                                return next({ 
+                                    success: false,
+                                    message: "You cannot follow yourself"
+                                })
+                            }
+            
+                            // create follow relationships
+                            user.followers.unshift(currentUser._id);
+                            user.save()
+            
+                            currentUser.followings.unshift(user._id);
+                            currentUser.save();
+            
+                            next({
+                                success: true,
+                                currentUser: currentUser.getData(),
+                            })
+            
+                            // update the other user's list
+                            io.to(user._id.toString()).emit("approach", remove(currentUser.id));
+                            io.to(user._id.toString()).emit("greet", add(currentUser.getData()));
+            
+                            // log
+                            console.log("* FOLLOW: following", user.id, "by", current_id, new Date().toISOString());
+                            log("FOLLOW", current_id, user._id);
+                        })
+                    })
+                } catch (err) {console.error(err)}
+            });
+
+            socket.on("unfollow", (data, next) => {
+                try {
+                    User.findOne({id: data.user_id}).then(user => {
+            
+                        // check if your id doesn't match the id of the user you want to unfollow
+                        if (user._id.toString() === current_id) {
+                            return next({ success: false, message: 'You cannot unfollow yourself' });
+                        }
+                        else {
+            
+                            // first update the list of the other user
+                            User.findById(current_id).then(currentUser => {
+                                io.to(user._id.toString()).emit("greet", remove(currentUser.id));
+            
+                                io.to(user._id.toString()).emit("approach", add(currentUser.getData(), "unfollowing"));
+                            })
+            
+                            // remove the id of the user you want to unfollow from following array
+                            unfollow(current_id, user._id);
+                            
+                            next({ success: true });
+            
+                            // log
+                            console.log("* UNFOLLOW: unfollowing", user.id, "by", current_id, new Date().toISOString());
+                            log("UNFOLLOW", current_id, user._id);
+                        }
+                        
+                    });
+                } catch (err) {
+                    return res.status(400).json({ success: false, error: err.message })
+                }
             })
 
             socket.on("disconnect", () => {

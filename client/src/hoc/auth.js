@@ -24,6 +24,8 @@ export default function (SpecificComponent, option) {
             //To know my current status, send Auth request 
             dispatch(authUser()).then(response => {
 
+                console.log(response);
+
                 setLoading(false);
                 setUser(response.payload);
 

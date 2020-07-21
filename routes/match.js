@@ -35,7 +35,7 @@ router.get("/finish", (req, res) => {
                 User.find({}, function(err, allUsers) {
                     allUsers.forEach((u) => {
                         const _id = u._id.toString()
-                        if (currentUser.followings.findIndex(f => f._id.toString() === _id) >= 0) {
+                        if (currentUser.isFollowing(_id)) {
                             io.to(_id).emit("greet", {
                                 type: "ADD",
                                 user: currentUser.getData(),
@@ -84,7 +84,7 @@ router.get("/finish", (req, res) => {
                                 following: "unfollowing",
                             })
                         }
-                        else if (currentUser.followings.findIndex(f => f._id.toString() === _id) >= 0) {
+                        else if (currentUser.isFollowing(_id)) {
                             io.to(_id).emit("greet", {
                                 type: "ADD",
                                 user: currentUser.getData(),
@@ -200,7 +200,7 @@ router.get("/cancel", (req, res) => {
                                 following: "unfollowing",
                             })
                         }
-                        else if (currentUser.followings.findIndex(f => f._id.toString() === _id) >= 0) {
+                        else if (currentUser.isFollowing(_id)) {
                             io.to(_id).emit("greet", {
                                 type: "ADD",
                                 user: currentUser.getData(),
@@ -244,7 +244,7 @@ router.get("/cancel_confirm", (req, res) => {
             User.find({}, function(err, allUsers) {
                 allUsers.forEach((u, i) => {
                     const _id = u._id.toString();
-                    if (currentUser.followings.findIndex(f => f._id.toString() === _id) >= 0) {
+                    if (currentUser.isFollowing(_id)) {
                         io.to(_id).emit("greet", {
                             type: "ADD",
                             user: currentUser.getData(),

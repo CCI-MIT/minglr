@@ -120,7 +120,7 @@ router.get("/unavailable", (req, res) => {
         const current_id = req.cookies.w_id;
         if (!current_id || current_id === undefined || current_id.length === 0 || current_id === "undefined") return;
         User.findById(current_id).then(currentUser => {
-            currentUser.deactivate();
+            currentUser.available = false;
 
             const io = req.app.get("io");
             User.find({}, function(err, allUsers) {
@@ -131,19 +131,22 @@ router.get("/unavailable", (req, res) => {
                             io.to(_id).emit("greet", {
                                 type: "REMOVE",
                                 user_id: currentUser.id,
-                            })
+                            });
                         }
                         else {
                             io.to(_id).emit("approach", {
                                 type: "REMOVE",
                                 user_id: currentUser.id,
-                            })
+                            });
                         }
                     }
                 });
             });
 
             currentUser.initialize();
+            currentUser.save((err, doc) => {
+                if (err) console.error(err);
+            })
         })
         
     } catch (err) {console.error(err)}

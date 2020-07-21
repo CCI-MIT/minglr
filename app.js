@@ -39,12 +39,14 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 
 // routing
 const indexRouter = require("./routes");
+const authRouter = require("./routes/auth");
 const usersRouter = require("./routes/users");
 const followsRouter = require("./routes/follows");
 const matchRouter = require("./routes/match");
 const updatesRouter = require("./routes/updates");
 const resetPasswordRouter = require("./routes/reset_password");
 app.use('/api', indexRouter)
+app.use('/api', authRouter)
 app.use('/api', usersRouter)
 app.use('/api', followsRouter)
 app.use('/api', matchRouter)

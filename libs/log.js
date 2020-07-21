@@ -1,6 +1,6 @@
 const { Log } = require("../schemas/Log");
 
-module.exports = function (kind, current_id, content_id = "") {
+const log = (kind, current_id, content_id = "") => {
     const log = new Log({
         kind: kind,
         content: content_id,
@@ -11,3 +11,4 @@ module.exports = function (kind, current_id, content_id = "") {
         if (err) console.error(err)
     });
 }
+module.exports = { log };

@@ -1,11 +1,12 @@
 import React from 'react';
+import { Link } from "react-router-dom";
 
 function NavBarOut() {
 
     return (
         <div>
             <nav>
-                <img className="logo" src={require("../../images/logo.svg")} alt="logo"/>
+                <Link to="/"><img className="logo" src={require("../../images/logo.svg")} alt="logo"/></Link>
             </nav>
         </div>
     )

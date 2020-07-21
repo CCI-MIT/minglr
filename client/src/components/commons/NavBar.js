@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import axios from "axios";
 import Cookies from 'js-cookie';
+import { Link } from "react-router-dom";
 import Settings from "./Settings";
 
 function NavBar(props) {
@@ -12,6 +13,7 @@ function NavBar(props) {
         e.target.classList.add("disabled")
 
         await axios.get('/api/logout').then(response => {
+            console.log(response);
             if (response.data.success) {
                 Cookies.set("w_authtype", "");
                 Cookies.set("w_id", "");
@@ -31,7 +33,7 @@ function NavBar(props) {
     return (
         <div>
             <nav className="loggedIn">
-                <img className="logo" src={require("../../images/logo.svg")} alt="logo"/>
+                <Link to="/"><img className="logo" src={require("../../images/logo.svg")} alt="logo"/></Link>
                 <div className="left-menu">
                     {/* <a className="btn" href="https://mit.zoom.us/j/92238074391?pwd=dnBydjN4TEhCUlF6VWxjTHg1NlViUT09" target="_blank" rel="noopener noreferrer">Go Back to Main Room</a> */}
                     <div id="logoutBtn" className="btn btn-white" onClick={logoutHandler}>Log Out</div> 

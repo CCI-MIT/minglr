@@ -1,6 +1,7 @@
 // models/User.js
 const mongoose = require("mongoose");
 
+const jwt = require('jsonwebtoken');
 const bcrypt = require("bcrypt")
 const saltRounds = 10 // step 0
 
@@ -73,7 +74,7 @@ const userSchema = new Schema({
 
 // crypt password before save
 userSchema.pre("save", function(next) {
-  var user = this;
+  let user = this;
   
   bcrypt.genSalt(saltRounds, function(err, salt) {
     if (err)
@@ -94,18 +95,30 @@ userSchema.pre("save", function(next) {
   })
 });
 
-userSchema.methods.comparePassword = function(plainPassword, cb) {
+// compare password when logging in
+userSchema.methods.comparePassword = function(plainPassword, next) {
   bcrypt.compare(plainPassword, this.password, function(err, isMatch) {
     if (err)
-      return cb(err);
-    cb(null, isMatch); // true일 것
+      return next(err);
+      next(null, isMatch); // should be true
   })
 }
 
-userSchema.methods.getData = function() {
-  var user = this;
+// check if the current user is following a certain user
+userSchema.methods.isFollowing = function(_id) {
+  return this.followings.findIndex(f => f._id.toString() === _id) >= 0
+}
 
-  var isMatched = (user.matched) ? true : false;
+// check if the current user is followed by a certain user
+userSchema.methods.isFollowedBy = function(_id) {
+  return this.followers.findIndex(f => f._id.toString() === _id) >= 0
+}
+
+// get basic data of the current user
+userSchema.methods.getData = function() {
+  let user = this;
+
+  let isMatched = (user.matched) ? true : false;
 
   return {
     _id: user._id,
@@ -119,11 +132,56 @@ userSchema.methods.getData = function() {
   };
 }
 
-
+// get full name of the current user
 userSchema.methods.getName = function() {
   return this.firstname + " " + this.lastname;
 }
 
+userSchema.methods.activate = function(type) {
+  let secret = process.env.FACEBOOK
+  if (type === "GOOGLE")
+      secret = process.env.GOOGLE
+
+  this.available = true;
+
+  const token = this._id.toHexString()
+  this.token = token;
+
+  return jwt.sign(token, secret);
+}
+
+userSchema.methods.deactivate = function() {
+  this.available = false;
+  this.token = "";
+}
+
+userSchema.methods.initialize = function() {
+  let user = this;
+
+  // initialize matched & calling status
+  user.matched = undefined;
+  user.calling = false;
+
+  // initialize followers & followings
+  user.followers.forEach((follower) => {
+      User.updateOne({_id: follower}, {
+          $pull: { followings: {_id: user._id} }
+      }, {safe: true}, function(err, obj) {
+          if (err) console.error(err);
+      });
+  });
+
+  user.followings.forEach((following) => {
+      User.updateOne({_id: following}, {
+          $pull: { followers: {_id: user._id} }
+      }, {safe: true}, function(err, obj) {
+          if (err) console.error(err);
+      });
+  });
+
+  user.followers = [];
+  user.followings = [];
+}
 
 const User = mongoose.model('User', userSchema);
 module.exports = { User }

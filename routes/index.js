@@ -2,12 +2,12 @@ const express = require("express");
 const router = express.Router();
 
 const { checkPassword } = require("../middleware/user/checkPassword");
-const { checkSNS } = require("../middleware/user/checkSNS");
+const { loginSNS } = require("../middleware/user/loginSNS");
 const { signup } = require("../middleware/user/signup");
 const { login } = require("../middleware/user/login");
 const { getCurrentUser } = require("../middleware/getCurrentUser");
 
-const log = require("../libs/log");
+const { log } = require("../libs/log");
 const { remove } = require("../libs/socket");
 
 router.post("/signup", signup, (req, res) => {
@@ -33,7 +33,7 @@ router.post("/login", checkPassword, login, (req, res) => {
     });
 })
 
-router.post("/login_sns", checkSNS, (req, res) => {
+router.post("/login_sns", loginSNS, (req, res) => {
     const user = res.locals.user;
     
     user.save((err, doc) => {

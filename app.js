@@ -15,13 +15,12 @@ const webSocket = require("./socket");
 const mongoose = require("mongoose");
 const {MONGO_ID, MONGO_PASSWORD, MONGO_APPNAME, NODE_ENV} = process.env;
 const MONGO_URL = `mongodb+srv://${MONGO_ID}:${MONGO_PASSWORD}@${MONGO_APPNAME}-gbvll.mongodb.net/test?retryWrites=true&w=majority`;
-const connect = mongoose.connect(MONGO_URL,
-  {
+const connect = mongoose.connect(MONGO_URL, {
     useNewUrlParser: true, useUnifiedTopology: true,
     useCreateIndex: true, useFindAndModify: false
-  })
-  .then(() => console.log('MongoDB Connected...'))
-  .catch(err => console.error(err));
+})
+.then(() => console.log('MongoDB Connected...'))
+.catch(err => console.error(err));
 // const connect = require("./schemas");
 // connect();
 

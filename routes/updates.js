@@ -2,6 +2,9 @@ const express = require("express");
 
 const { User } = require("../schemas/User");
 
+const { getCurrentUser } = require("../middleware/getCurrentUser");
+const { remove } = require("../libs/socket");
+
 const router = express.Router();
 
 const multer = require("multer");
@@ -26,130 +29,107 @@ const storage = cloudinaryStorage({
 
 const parser = multer({ storage: storage });
 
-router.post("/update_image", parser.single("image"), function (req, res) {
-    const current_id = req.cookies.w_id;
+router.post("/update_image", parser.single("image"), getCurrentUser, function (req, res) {
+    const user = res.locals.user;
+    const current_id = user._id.toString();
 
-    try {
-        if (!current_id || current_id === undefined || current_id.length === 0 || current_id === "undefined") return;
-        User.findById(current_id).then(user => {
-            user.image = req.file.url;
-            console.log(user);
-            user.save((err, doc) => {
-                res.status(200).json({
-                    success: true,
-                    image: req.file.url,
-                });
+    user.image = req.file.url;
+    console.log(user);
+    user.save((err, doc) => {
+        res.status(200).json({
+            success: true,
+            image: req.file.url,
+        });
 
-                const io = req.app.get("io"); 
-                User.find({}, function(err, allUsers) {
-                    if (err) console.error(err);
+        const io = req.app.get("io"); 
+        User.find({}, function(err, allUsers) {
+            if (err) console.error(err);
 
-                    allUsers.forEach((u) => {
-                        const _id = u._id.toString();
-                        if (_id !== current_id) {
-                            const data = {
-                                type: "UPDATE_IMAGE",
-                                _id: current_id,
-                                image: req.file.url,
-                            }
-                            if (user.followings.findIndex(f => f._id.toString() === _id) >= 0) {
-                                io.to(_id).emit("greet", data)
-                            }
-                            else {
-                                io.to(_id).emit("approach", data)
-                            }
-                        }
-                    })
-                });
+            const data = {
+                type: "UPDATE_IMAGE",
+                _id: current_id,
+                image: req.file.url,
+            }
+
+            allUsers.forEach((u) => {
+                const _id = u._id.toString();
+                if (_id !== current_id) {
+                    if (user.isFollowing(_id)) {
+                        io.to(_id).emit("greet", data)
+                    }
+                    else {
+                        io.to(_id).emit("approach", data)
+                    }
+                }
             })
         });
-        return;
-    } catch (err) {console.error(err)}
+    });
 });
 
-router.post("/update", (req, res) => {
-    const current_id = req.cookies.w_id;
+router.post("/update", getCurrentUser, (req, res) => {
+    const user = res.locals.user;
+    const current_id = user._id.toString();
 
-    try {
-        if (!current_id || current_id === undefined || current_id.length === 0 || current_id === "undefined") return;
-        User.findById(current_id).then(user => {
-            if (!user) {
-                return res.status(200).json({
-                    success: false,
-                })
+    user.firstname = req.body.firstname;
+    user.lastname = req.body.lastname;
+    user.affiliation = req.body.affiliation;
+    user.keywords = req.body.keywords;
+    user.save();
+    res.status(200).json({
+        success: true,
+    });
+
+    const io = req.app.get("io"); 
+    User.find({}, function(err, allUsers) {
+        if (err) console.error(err);
+
+        const data = {
+            type: "UPDATE",
+            _id: current_id,
+            firstname: user.firstname,
+            lastname: user.lastname,
+            affiliation: user.affiliation,
+            keywords: user.keywords,
+        }
+
+        allUsers.forEach((u) => {
+            const _id = u._id.toString();
+            if (_id !== current_id) {
+                if (user.followings.findIndex(f => f._id.toString() === _id) >= 0) {
+                    io.to(_id).emit("greet", data)
+                }
+                else {
+                    io.to(_id).emit("approach", data)
+                }
             }
-            user.firstname = req.body.firstname;
-            user.lastname = req.body.lastname;
-            user.affiliation = req.body.affiliation;
-            user.keywords = req.body.keywords;
-            user.save();
-            res.status(200).json({
-                success: true,
-            });
-
-            const io = req.app.get("io"); 
-            User.find({}, function(err, allUsers) {
-                if (err) console.error(err);
-
-                allUsers.forEach((u) => {
-                    const _id = u._id.toString();
-                    if (_id !== current_id) {
-                        const data = {
-                            type: "UPDATE",
-                            _id: current_id,
-                            firstname: user.firstname,
-                            lastname: user.lastname,
-                            affiliation: user.affiliation,
-                            keywords: user.keywords,
-                        }
-                        if (user.followings.findIndex(f => f._id.toString() === _id) >= 0) {
-                            io.to(_id).emit("greet", data)
-                        }
-                        else {
-                            io.to(_id).emit("approach", data)
-                        }
-                    }
-                })
-            });
         })
-    } catch (err) {console.error(err)}
+    });
 });
 
-router.get("/unavailable", (req, res) => {
-    try {
-        const current_id = req.cookies.w_id;
-        if (!current_id || current_id === undefined || current_id.length === 0 || current_id === "undefined") return;
-        User.findById(current_id).then(currentUser => {
-            currentUser.available = false;
+router.get("/unavailable", getCurrentUser, (req, res) => {
+    const currentUser = res.locals.user;
+    const current_id = user._id.toString();
+    currentUser.available = false;
 
-            const io = req.app.get("io");
-            User.find({}, function(err, allUsers) {
-                allUsers.forEach((u) => {
-                    const _id = u._id.toString();
-                    if (_id !== current_id) {
-                        if (currentUser.isFollowing(_id)) {
-                            io.to(_id).emit("greet", {
-                                type: "REMOVE",
-                                user_id: currentUser.id,
-                            });
-                        }
-                        else {
-                            io.to(_id).emit("approach", {
-                                type: "REMOVE",
-                                user_id: currentUser.id,
-                            });
-                        }
-                    }
-                });
-            });
+    const io = req.app.get("io");
+    User.find({}, function(err, allUsers) {
+        allUsers.forEach((u) => {
+            const _id = u._id.toString();
+            if (_id !== current_id) {
+                if (currentUser.isFollowing(_id)) {
+                    io.to(_id).emit("greet", remove(currentUser.id));
+                }
+                else {
+                    io.to(_id).emit("approach", remove(currentUser.id));
+                }
+            }
+        });
+    });
 
-            currentUser.initialize();
-            currentUser.save((err, doc) => {
-                if (err) console.error(err);
-            })
-        })
-        
-    } catch (err) {console.error(err)}
+    currentUser.initialize();
+    currentUser.save((err, doc) => {
+        if (err) console.error(err);
+    })
 });
 
 module.exports = router;

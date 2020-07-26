@@ -3,7 +3,7 @@ const { User } = require('../../schemas/User');
 const { createUser } = require("./createUser");
 const { login } = require("./login");
 
-let checkSNS = (req, res, next) => {
+let loginSNS = (req, res, next) => {
     try {
         User.findOne({ email: req.body.email }, (err, user) => {
             if (!user) {
@@ -17,4 +17,4 @@ let checkSNS = (req, res, next) => {
     } catch (err) {console.error(err);}
 }
 
-module.exports = { checkSNS };
+module.exports = { loginSNS };

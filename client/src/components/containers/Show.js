@@ -11,7 +11,8 @@ class Show extends React.Component{
       
       this.state = {
         isLoading: true,
-        users: []
+        users: [],
+        matchedUser: null,
       }
     }
 
@@ -19,10 +20,11 @@ class Show extends React.Component{
         await axios.get('api/users/' + id)
         .then(response => {
             console.log(response);
-            this.setState(prevState => ({
+            this.setState({
                 isLoading: false,
-                users: response.data.followers
-            }))
+                users: response.data.followers,
+                matchedUser: response.data.matched,
+            });
         })
     }
 
@@ -50,7 +52,7 @@ class Show extends React.Component{
     }
 
     render() {
-        const { users, isLoading } = this.state;
+        const { users, isLoading, matchedUser } = this.state;
         const { user, currentUser, handleClose } = this.props;
 
         const isNoOne = users.length <= 0 ? "No one yet." : "";
@@ -67,19 +69,29 @@ class Show extends React.Component{
                         <p>{user.affiliation} {user.keywords ? ` | ${user.keywords}`: ""}</p>
                         {isLoading ? <Loader /> :(
                             <div className="show-container">
-                                {/* <h4>{user.firstname} is now talking to...</h4> */}
-                                <h4>People waiting for {user.firstname}...</h4>
-                                {users.map(this.renderUserData)}
-                                {user.following ?
-                                    <div className="no-hover user me">
-                                        <User
-                                            user={currentUser}
-                                            me={true}
-                                        />
-                                    </div>
-                                    :
-                                    isNoOne
+                                { matchedUser ? 
+                                <>
+                                    <h4>{user.firstname} is now talking to...</h4>
+                                    {this.renderUserData(matchedUser)}
+                                </>
+                                :
+                                ""
                                 }
+
+                                <>
+                                    <h4>People waiting for {user.firstname}...</h4>
+                                    {users.map(this.renderUserData)}
+                                    {user.following ?
+                                        <div className="no-hover user me">
+                                            <User
+                                                user={currentUser}
+                                                me={true}
+                                            />
+                                        </div>
+                                        :
+                                        isNoOne
+                                    }
+                                </>
                             </div>
                         )}
                         {user.following ?

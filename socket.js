@@ -6,6 +6,7 @@ const { User } = require("./schemas/User");
 
 const { unfollow } = require("./libs/unfollow");
 const { log } = require("./libs/log");
+const { addNewUser, removeMatchedUsers } = require("./libs/socketMethods");
 const { add, remove, markAsMatched } = require("./libs/socket");
 
 module.exports = (server, app) => {
@@ -16,25 +17,6 @@ module.exports = (server, app) => {
 
     let isConnected = false;
 
-    const addNewUser = (currentUser) => {
-        User.find({}, function(err, allUsers) {
-            allUsers.forEach((u) => {
-                const _id = u._id.toString()
-                if (_id !== currentUser._id.toString()) {
-                    if (currentUser.isFollowing(_id)) {
-                        io.to(_id).emit( "greet", add(currentUser.getData()) );
-                    }
-                    else if (currentUser.isFollowedBy(_id)) {
-                        io.to(_id).emit( "approach", add(currentUser.getData(), "following") );
-                    }
-                    else {
-                        io.to(_id).emit( "approach", add(currentUser.getData(), "unfollowing") );
-                    }
-                }
-            });
-        });
-    }
-
     const setMatchedInformation = (currentUser, receiver) => {
         // update the matched field of receiver
         receiver.matched = currentUser._id;
@@ -44,7 +26,8 @@ module.exports = (server, app) => {
         currentUser.matched = receiver._id;
 
         // calculate the room name
-        let roomName = currentUser._id.toString() + currentUser.roomIndex;
+        let current_id = currentUser._id.toString();
+        let roomName = current_id + currentUser.roomIndex;
         currentUser.roomIndex = currentUser.roomIndex + 1;
         currentUser.save();
 
@@ -59,32 +42,6 @@ module.exports = (server, app) => {
         });
     }
 
-    const removeMatchedUsers = (currentUser, receiver) => {
-        // remove or mark these two from the other's client
-        User.find({}, function(err, allUsers) {
-            allUsers.forEach((u, i) => {
-                const _id = u._id.toString();
-
-                // remove receiver from greet 
-                if (_id === currentUser._id.toString() || receiver.isFollowing(_id)) {
-                    io.to(_id).emit( "greet", remove(receiver.id) );
-                }
-                // mark receiver as talking
-                else {
-                    io.to(_id).emit( "approach", markAsMatched(receiver._id) );
-                }
-
-                // remove receiver from greet 
-                if (_id === receiver._id || currentUser.isFollowing(_id)) {
-                    io.to(_id).emit( "greet", remove(currentUser.id) );
-                }
-                // mark currentUser as talking
-                else {
-                    io.to(_id).emit( "approach", markAsMatched(currentUser._id) );
-                }
-            });
-        })
-    }
 
     io.on("connection", (socket) => {
 
@@ -102,34 +59,38 @@ module.exports = (server, app) => {
 
                         currentUser.available = true;
                         currentUser.save((err, doc) => {
-                            addNewUser(currentUser);
+                            addNewUser(currentUser, io);
                             isConnected = true;
                         });
                     }
                 });
             } catch (err) {console.error(err);}
 
-            socket.on("match", (data) => {
+            socket.on("match", (data, next) => {
                 try {
                     User.findOne({id: data.receiver}).then(receiver => {
                         // if already matched, return
                         if (receiver.matched) {
-                            io.to(current_id).emit("matchFail");
-                            return;
+                            return next({
+                                success: false,
+                                message: "Sorry, this user is already matched to someone else.",
+                            })
                         }
                         else {
                             // if already matched, return
                             User.findById(current_id).then(currentUser => {
                                 if (currentUser.matched) {
-                                    io.to(current_id).emit("matchFail");
-                                    return;
+                                    return next({
+                                        success: false,
+                                        message: "Sorry, you already clicked on this user.",
+                                    })
                                 }
                             
                                 // set matched, roomIndex, roomName, and show call to two people
                                 setMatchedInformation(currentUser, receiver)
 
                                 // remove or mark these two from the other's client
-                                removeMatchedUsers(currentUser, receiver);
+                                removeMatchedUsers(currentUser, receiver, io);
                                 
                                 // delete follow relationship
                                 unfollow(receiver._id, currentUser._id);

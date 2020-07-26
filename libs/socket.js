@@ -1,11 +1,18 @@
 module.exports = {
-    add: function(data, following = "") {
-        if (following == "following" || following == "unfollowing")
+    add: function(data, msg = "") {
+        if (msg == "following" || msg == "unfollowing")
             return {
                 type: "ADD",
                 user: data,
-                following: following,
+                following: msg,
             }
+        else if (msg == "matched" || msg == "unmatched") {
+            return {
+                type: "ADD",
+                user: data,
+                matched: msg,
+            }
+        }
         else 
             return {
                 type: "ADD",
@@ -21,6 +28,12 @@ module.exports = {
     markAsMatched: function(_id) {
         return {
             type: "MATCHED",
+            _id: _id.toString(),
+        }
+    },
+    unmarkAsMatched: function(_id) {
+        return {
+            type: "UNMATCHED",
             _id: _id.toString(),
         }
     }

@@ -38,6 +38,10 @@ class Greet extends React.Component {
         if (!clickDisabled) {
             socket.emit("match", {
                 receiver: id
+            }, (response) => {
+                if (!response.success) {
+                    alert(response.message);
+                }
             });
         }
         
@@ -133,9 +137,6 @@ class Greet extends React.Component {
         const { socket } = this.props;
 
         if (this._isMounted) {
-            socket.on("matchFail", () => {
-                alert("Sorry, this user is already talking to someone else.")
-            });
             socket.on("greet", data => {
                 console.log(data);
                 if (data.type === "ADD" && !this.state.users.find(u => u.id === data.user.id))

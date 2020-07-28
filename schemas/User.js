@@ -106,12 +106,12 @@ userSchema.methods.comparePassword = function(plainPassword, next) {
 
 // check if the current user is following a certain user
 userSchema.methods.isFollowing = function(_id) {
-  return this.followings.findIndex(f => f._id.toString() === _id) >= 0
+  return this.followings.findIndex(f => f._id.toString() === _id.toString()) >= 0
 }
 
 // check if the current user is followed by a certain user
 userSchema.methods.isFollowedBy = function(_id) {
-  return this.followers.findIndex(f => f._id.toString() === _id) >= 0
+  return this.followers.findIndex(f => f._id.toString() === _id.toString()) >= 0
 }
 
 // get basic data of the current user

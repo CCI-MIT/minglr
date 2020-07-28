@@ -108,7 +108,7 @@ router.post("/update", getCurrentUser, (req, res) => {
 
 router.get("/unavailable", getCurrentUser, (req, res) => {
     const currentUser = res.locals.user;
-    const current_id = user._id.toString();
+    const current_id = currentUser._id.toString();
     currentUser.available = false;
 
     const io = req.app.get("io");

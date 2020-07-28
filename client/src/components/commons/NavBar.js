@@ -42,7 +42,7 @@ function NavBar(props) {
                     </div>
                 </div>
             </nav>
-            {settings ? <Settings {...props} settingsHandler={settingsHandler} /> : <></>}
+            <Settings {...props} settings={settings} settingsHandler={settingsHandler} />
         </div>
     )
 }

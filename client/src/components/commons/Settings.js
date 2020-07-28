@@ -1,13 +1,31 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import axios from "axios";
 
 function Settings(props) {
 
-    const [firstname, setFirstname] = useState(props.currentUser.firstname || "");
-    const [lastname, setLastname] = useState(props.currentUser.lastname || "");
-    const [affiliation, setAffiliation] = useState(props.currentUser.affiliation || "");
-    const [keywords, setKeywords] = useState(props.currentUser.keywords || "");
-    const [image, setImage] = useState(props.currentUser.image || require("../../images/default_user.jpeg"));
+    const [initialized, setInitialized] = useState(false);
+    const [firstname, setFirstname] = useState("");
+    const [lastname, setLastname] = useState("");
+    const [affiliation, setAffiliation] = useState("");
+    const [keywords, setKeywords] = useState("");
+    const [image, setImage] = useState(require("../../images/default_user.jpeg"));
+
+    useEffect(() => {
+        if (!initialized && props.currentUser) {
+            setInitialized(true);
+
+            if (props.currentUser.firstname)
+                setFirstname(props.currentUser.firstname);
+            if (props.currentUser.lastname)
+                setLastname(props.currentUser.lastname);
+            if (props.currentUser.affiliation)
+                setAffiliation(props.currentUser.affiliation);
+            if (props.currentUser.keywords)
+                setKeywords(props.currentUser.keywords);
+            if (props.currentUser.image)
+                setImage(props.currentUser.image);
+        }
+    })
     
     const onFirstnameHandler = (event) => {
         setFirstname(event.currentTarget.value)
@@ -49,6 +67,9 @@ function Settings(props) {
                 if (response.data.success) {
                     setImage(response.data.image);
                 }
+                else {
+                    alert("Upload failed. Please try again.")
+                }
             })
         }
         else {
@@ -74,7 +95,7 @@ function Settings(props) {
        return true;
     }
     return (
-        <div className="settings-body">
+        <div className={`settings-body ${props.settings ? "" : "hidden"}`}>
             <h3>Your Information</h3>
             <div className="user_image">
                 <img src={image} alt="profile image"/>

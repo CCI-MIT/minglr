@@ -49,6 +49,7 @@ class Home extends React.Component {
                     disableSimulcast: false,
                     disableDeepLinking: true,
                     useStunTurn: true,
+                    prejoinPageEnabled: false,
                 },
             };
 

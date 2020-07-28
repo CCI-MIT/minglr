@@ -157,29 +157,29 @@ module.exports = (server, app) => {
 
             socket.on("unfollow", (data, next) => {
                 try {
-                    User.findOne({id: data.user_id}).then(user => {
+                    User.findOne({id: data.user_id}).then(unfollowedUser => {
+                        const unfollowed_id = unfollowedUser._id.toString();
             
                         // check if your id doesn't match the id of the user you want to unfollow
-                        if (user._id.toString() === current_id) {
+                        if (unfollowed_id === current_id) {
                             return next({ success: false, message: 'You cannot unfollow yourself' });
                         }
                         else {
             
                             // first update the list of the other user
                             User.findById(current_id).then(currentUser => {
-                                io.to(user._id.toString()).emit("greet", remove(currentUser.id));
-            
-                                io.to(user._id.toString()).emit("approach", add(currentUser.getData(), "unfollowing"));
+                                io.to(unfollowed_id).emit("greet", remove(currentUser.id));
+                                io.to(unfollowed_id).emit("approach", add(currentUser.getData(), "unfollowing"));
                             })
             
                             // remove the id of the user you want to unfollow from following array
-                            unfollow(current_id, user._id);
+                            unfollow(current_id, unfollowed_id);
                             
                             next({ success: true });
             
                             // log
-                            console.log("* UNFOLLOW: unfollowing", user.id, "by", current_id, new Date().toISOString());
-                            log("UNFOLLOW", current_id, user._id);
+                            console.log("* UNFOLLOW: unfollowing", unfollowedUser.id, "by", current_id, new Date().toISOString());
+                            log("UNFOLLOW", current_id, unfollowed_id);
                         }
                         
                     });

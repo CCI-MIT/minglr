@@ -37,7 +37,7 @@ const finish = (req, res, next) => {
     })
 
     // send message
-    putBackMatchedUser(currentUser, matched_id);
+    putBackMatchedUser(currentUser, matched_id, io);
 
     log("FINISHED", current_id, matched_id);
 }

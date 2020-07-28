@@ -355,6 +355,10 @@ nav {
     pointer-events: none !important;
 }
 
+.hidden {
+    display: none;
+}
+
 .settings-body {
     position: absolute;
     right: 0;

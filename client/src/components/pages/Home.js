@@ -221,11 +221,6 @@ class Home extends React.Component {
                 e.preventDefault();
                 // Chrome requires returnValue to be set
                 e.returnValue = '';
-
-                if (this.state.mode === "call") {
-                    if (this.api) this.api.executeCommand('hangup');
-                    this.handleFinish();
-                }
     
                 await axios.get("/api/unavailable");
             });

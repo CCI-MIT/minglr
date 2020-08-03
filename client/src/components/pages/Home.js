@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import NavBar from "../commons/NavBar";
 import Loader from "../commons/Loader";
+import GroupCreator from "../libs/GroupCreator";
 import { Link } from "react-router-dom";
 import { copyTextToClipboard } from "../../utils/copy";
 import axios from 'axios';
@@ -48,7 +49,7 @@ class Home extends Component {
         }
     }
 
-    renderTable(groups) {
+    renderTable(groups, isCreate) {
         const { isLoading } = this.state;
         return <>{isLoading ?
             <Loader />
@@ -62,11 +63,16 @@ class Home extends Component {
                     </tr>
                 </thead>
                 <tbody>
-                    {groups.length === 0 ? 
+                    <>{isCreate ?
+                        <GroupCreator/>
+                        :
+                        null
+                    }</>
+                    <>{groups.length === 0 ? 
                         <tr><td>None</td></tr>
                         : 
                         groups.map(this.renderGroups)
-                    }
+                    }</>
                 </tbody>
             </table>
         }</>
@@ -85,11 +91,11 @@ class Home extends Component {
                 <main className="home">
                     <div className="container full-width">
                         <h2>Groups you have joined</h2>
-                        {this.renderTable(joinedGroups)}
+                        {this.renderTable(joinedGroups, false)}
                     </div>
                     <div className="container full-width">
                         <h2>Groups you have created</h2>
-                        {this.renderTable(createdGroups)}
+                        {this.renderTable(createdGroups, true)}
                     </div>
                 </main>
             </div>

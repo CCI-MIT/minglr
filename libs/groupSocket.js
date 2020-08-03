@@ -14,8 +14,6 @@ const groupSocket = (io, group_id) => {
 // set namespace
 const groupIO = io.of(`/group${group_id}`);
 
-console.log(groupIO);
-
 // variable to detect consistent disconnection
 let isConnected = false;
 
@@ -183,7 +181,6 @@ groupIO.on("connection", (socket) => {
     })
 
     socket.on("disconnect", () => {
-        // console.log(socket);
         const current_id = cookie.parse(socket.handshake.headers.cookie).w_id;
         console.log("SOCKET DISCONNECTED", current_id);
 

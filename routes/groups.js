@@ -22,8 +22,6 @@ function getGroups(groups) {
                 result.push(g.getData());
 
                 if (i === last) {
-                    console.log("result");
-                    console.log(result);
                     resolve(result);
                 }
             })
@@ -45,8 +43,6 @@ router.get("/groups", getCurrentUser, async (req, res) => {
 
         await getGroups(currentUser.joinedGroups).then(async joinedGroups => {
             await getGroups(currentUser.createdGroups).then(createdGroups => {
-                console.log(joinedGroups);
-                console.log(createdGroups);
 
                 return res.status(200).json({
                     success: true,
@@ -59,7 +55,7 @@ router.get("/groups", getCurrentUser, async (req, res) => {
     } catch (err) {console.error(err)}
 });
 
-router.get("/group/:group_id", getCurrentUser, async (req, res) => {
+router.get("/group/:group_id", getCurrentUser, (req, res) => {
     const user = res.locals.user;
     const group_id = req.params.group_id;
 
@@ -83,7 +79,8 @@ router.get("/group/:group_id", getCurrentUser, async (req, res) => {
 
                 // set group_id as available
                 user.available = group._id;
-                group.activeMembers.unshift(user._id);
+                if (group.activeMembers.filter(m => m._id.equals(user._id)).length === 0)
+                    group.activeMembers.unshift(user._id);
                 group.save((err, doc) => {
 
                     // send response
@@ -115,6 +112,24 @@ router.get("/group/:group_id", getCurrentUser, async (req, res) => {
     } catch (err) {
         console.error(err);
     }
+})
+
+router.post("/create_group", getCurrentUser, (req, res) => {
+    const user = res.locals.user;
+
+    const group = new Group({
+        name: req.body.name,
+        creator: user._id,
+    });
+
+    group.save((err, doc) => {
+        user.createdGroups.unshift(group._id);
+        user.save((err, doc) => {
+            return res.json({
+                success: true,
+            });
+        })
+    })
 })
 
 module.exports = router;

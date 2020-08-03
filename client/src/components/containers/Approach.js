@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 import Show from './Show';
 import User from "../commons/User";
 import Loader from "../commons/Loader";
-import Search from "../approach/Search";
+import Search from "../libs/Search";
 
 class Approach extends React.Component { 
     _isMounted = false;

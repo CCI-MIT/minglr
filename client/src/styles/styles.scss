@@ -27,6 +27,9 @@ h1, h2, h3, h4, h5, h6 {
 .full-width {
     width: 100%;
 }
+.clickable {
+    cursor: pointer;
+}
 
 nav {
     max-width: 100%;
@@ -71,6 +74,18 @@ main {
     .container {
         margin-bottom: 1.5rem;
         flex-direction: column;
+    }
+    table th:first-child,
+    table td:first-child {
+        width: 70%;
+    }
+    .groupCreator {
+        background-color: #efefef;
+        input {
+            width: 200px;
+            max-width: 100%;
+            padding: .95rem 1.5rem;
+        }
     }
 }
 .approach {

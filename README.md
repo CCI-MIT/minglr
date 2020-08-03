@@ -1,3 +1,7 @@
+# Minglr
+
+MINGLR is an experimental software system developed to explore ways of supporting ad hoc, private videoconferences. We expect it to be useful for virtual conferences and many other kinds of online events, both business and social. An MIT working paper about the MINGLR system and its use at the ACM Collective Intelligence virtual conference (CI 2020) in June 2020 is available [here](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=3662620).
+
 * Logs (production)
     * `heroku logs --tail --app=minglr-mit`
     * `heroku logs --tail --app=pacific-anchorage-20064`

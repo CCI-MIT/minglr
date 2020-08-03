@@ -30,8 +30,8 @@ router.get("/users/:user_id", (req, res) => {
 
             clickedUser.followers.forEach(function(_id) {
                 User.findById(_id).then(u => {
-                    if (u.available)
-                        newFollowers.push(u.getData());
+                    // check if available == this room id
+                    newFollowers.push(u.getData());
                 })
             });
 

@@ -11,7 +11,6 @@ let signup = (req, res, next) => {
             email: req.body.email,
             password: req.body.password,
             id: index,
-            available: true,
         });
 
         const token = user.activate(req.body.type);

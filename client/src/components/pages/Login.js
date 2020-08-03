@@ -16,7 +16,10 @@ function Login(props) {
         if (data.success) {
             Cookies.set("w_id", data._id);
             Cookies.set("w_authtype", authtype);
-            props.history.push('/home');
+            if (props.location.state && props.location.state.from)
+                props.history.push(props.location.state.from);
+            else
+                props.history.push('/home');
         }
         else {
             alert("Login failed. Please try again.")

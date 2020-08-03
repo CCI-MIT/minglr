@@ -18,7 +18,7 @@ class Greet extends React.Component {
     }
 
     getUsers = async () => {
-      await axios.get('/api/greet').then(response => {
+      await axios.get(`/api/greet`).then(response => {
           if (response.data.success) {
             const users = response.data.followers
             this.setState(prevState => ({ 

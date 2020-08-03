@@ -6,6 +6,7 @@ const { loginSNS } = require("../middleware/user/loginSNS");
 const { signup } = require("../middleware/user/signup");
 const { login } = require("../middleware/user/login");
 const { getCurrentUser } = require("../middleware/getCurrentUser");
+const { getCurrentGroup } = require("../middleware/getCurrentGroup");
 
 const { log } = require("../libs/log");
 const { remove } = require("../libs/socket");
@@ -43,7 +44,7 @@ router.post("/login_sns", loginSNS, (req, res) => {
     })
 })
 
-router.get("/logout", getCurrentUser, (req, res) => {
+router.get("/logout", getCurrentUser, getCurrentGroup, (req, res) => {
     const user = res.locals.user;
     
     res.status(200)
@@ -52,14 +53,15 @@ router.get("/logout", getCurrentUser, (req, res) => {
         success: true
     });
 
+    const io = req.app.get("io"); 
+    const groupIO = io.of(`/group${user.available.toString()}`);
+    groupIO.emit("greet", remove(user.id));
+    groupIO.emit("approach", remove(user.id));
+
     user.deactivate();
     user.initialize();
     
     user.save((err, doc) => {
-        const io = req.app.get("io"); 
-        io.emit("greet", remove(doc.id));
-        io.emit("approach", remove(doc.id));
-
         log("LOGOUT", doc._id.toString());
     });
 })

@@ -2,6 +2,7 @@ import React, { Suspense } from 'react';
 import { Route, Switch } from "react-router-dom";
 import Auth from "../hoc/auth";
 import Home from "./pages/Home";
+import Group from "./pages/Group";
 import Consent from "./pages/Consent";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -26,6 +27,7 @@ function App() {
         <Switch>
           <Route exact path="/" component={Auth(Consent, true)} />
           <Route exact path="/home" component={Auth(Home, true)} />
+          <Route path="/group/:id" component={Auth(Group, true)} />
 
           <Route exact path="/login" component={Auth(Consent, false)} />
           <Route exact path="/signup" component={Auth(Signup, false)} />

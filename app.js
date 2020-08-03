@@ -40,12 +40,14 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 const indexRouter = require("./routes");
 const authRouter = require("./routes/auth");
 const usersRouter = require("./routes/users");
+const groupsRouter = require("./routes/groups");
 const matchRouter = require("./routes/match");
 const updatesRouter = require("./routes/updates");
 const resetPasswordRouter = require("./routes/reset_password");
 app.use('/api', indexRouter)
 app.use('/api', authRouter)
 app.use('/api', usersRouter)
+app.use('/api', groupsRouter)
 app.use('/api', matchRouter)
 app.use('/api', updatesRouter)
 app.use('/api', resetPasswordRouter)

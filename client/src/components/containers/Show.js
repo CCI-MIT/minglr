@@ -17,7 +17,7 @@ class Show extends React.Component{
     }
 
     getUserData = async (id) => {
-        await axios.get('api/users/' + id)
+        await axios.get('/api/users/' + id)
         .then(response => {
             console.log(response);
             this.setState({

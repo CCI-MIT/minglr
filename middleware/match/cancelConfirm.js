@@ -3,7 +3,10 @@ const { putBackUser } = require("../../libs/socketMethods");
 
 const cancelConfirm = (req, res, next) => {
     const currentUser = res.locals.user;
+    const group = res.locals.group;
+
     const io = req.app.get("io"); 
+    const groupIO = io.of(`/group${currentUser.available.toString()}`);
     
     if (!currentUser.matched) {
         return res.status(200).json({
@@ -20,6 +23,6 @@ const cancelConfirm = (req, res, next) => {
     })
 
     // put the cancellee back to the others' lists
-    putBackUser(currentUser, io);
+    putBackUser(group.activeMembers, currentUser, groupIO);
 }
 module.exports = { cancelConfirm }

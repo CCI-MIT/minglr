@@ -65,6 +65,14 @@ main {
     border: 0;
     cursor: pointer;
 }
+.home {
+    padding: 1.5rem 2rem;
+    flex-direction: column;
+    .container {
+        margin-bottom: 1.5rem;
+        flex-direction: column;
+    }
+}
 .approach {
     margin: 1.5rem 2rem 1.5rem 2rem;
     width: 66.6666%;
@@ -518,3 +526,4 @@ nav {
 }
 
 @import "mobile.scss";
+@import "table.scss";

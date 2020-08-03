@@ -4,7 +4,7 @@ let login = (req, res, next) => {
     const user = res.locals.user;
 
     const token = user.activate(req.body.type);
-    res.cookie("w_auth", token, { maxAge: 2 * 60 * 60 * 1000, httpOnly: true })
+    res.cookie("w_auth", token, { httpOnly: true })
     .status(200)
     .json({
         success: true,

@@ -1,6 +1,5 @@
 const { User } = require('../../schemas/User');
 
-const { createUser } = require("./createUser");
 const { login } = require("./login");
 
 let loginSNS = (req, res, next) => {
@@ -18,7 +17,7 @@ let loginSNS = (req, res, next) => {
                     });
 
                     const token = user.activate(req.body.type);
-                    res.cookie("w_auth", token, { maxAge: 2 * 60 * 60 * 1000, httpOnly: true })
+                    res.cookie("w_auth", token, { httpOnly: true })
                         .status(200)
                         .json({
                             success: true,

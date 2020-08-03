@@ -30,7 +30,7 @@ function Login(props) {
                 alert("Please allow cookies to sign up with SNS.")
             }
             else {
-                alert("Login failed. Please try again.")
+                alert("Google OAuth failed. Please try again.")
             }
         }
         else {
@@ -52,7 +52,7 @@ function Login(props) {
     const facebookHandler = (response) => {
         console.log(response);
         if(!response.accessToken) {
-            alert("Login failed. Please try again.")
+            alert("Facebook OAuth failed. Please try again.")
         }
         else {
             const facebookResponse = {

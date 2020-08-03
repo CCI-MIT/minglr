@@ -12,6 +12,7 @@ let loginSNS = (req, res, next) => {
                     const user = new User({
                         firstname: req.body.firstname,
                         lastname: req.body.lastname,
+                        image: req.body.image,
                         email: req.body.email,
                         id: index,
                     });

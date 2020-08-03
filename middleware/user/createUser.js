@@ -1,6 +1,6 @@
 const { User } = require('../../schemas/User');
 
-let signup = (req, res, next) => {
+let createUser = (req, res, next) => {
     // calculate index
     let index = 0
     User.findOne().sort({$natural: -1}).limit(1).exec(function(err, last){
@@ -28,4 +28,4 @@ let signup = (req, res, next) => {
                 
 };
 
-module.exports = { signup };
+module.exports = { createUser };

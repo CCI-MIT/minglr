@@ -24,11 +24,11 @@ function App() {
     <Suspense fallback={(<div>Loading...</div>)}>
       <Provider template={AlertTemplate} {...options}>
         <Switch>
-          <Route exact path="/" component={Auth(Consent, true)} />
-          <Route exact path="/home" component={Auth(Home, true)} />
-
+          <Route exact path="/" component={Auth(Consent, false)} />
           <Route exact path="/login" component={Auth(Consent, false)} />
           <Route exact path="/signup" component={Auth(Signup, false)} />
+
+          <Route exact path="/home" component={Auth(Home, true)} />
 
           <Route exact path="/forgotpassword" component={Auth(ForgotPassword, false)} />
           <Route path="/resetpassword/:token" component={Auth(ResetPassword, false)} />

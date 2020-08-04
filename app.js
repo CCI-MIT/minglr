@@ -14,7 +14,7 @@ const webSocket = require("./socket");
 // mongoDB connection
 const mongoose = require("mongoose");
 const {MONGO_ID, MONGO_PASSWORD, MONGO_APPNAME, NODE_ENV} = process.env;
-const MONGO_URL = `mongodb+srv://${MONGO_ID}:${MONGO_PASSWORD}@${MONGO_APPNAME}.qioqg.mongodb.net/test?retryWrites=true&w=majority`;
+const MONGO_URL = `mongodb+srv://${MONGO_ID}:${MONGO_PASSWORD}@${MONGO_APPNAME}-gbvll.mongodb.net/test?retryWrites=true&w=majority`;
 const connect = mongoose.connect(MONGO_URL, {
     useNewUrlParser: true, useUnifiedTopology: true,
     useCreateIndex: true, useFindAndModify: false

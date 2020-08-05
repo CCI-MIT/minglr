@@ -37,6 +37,7 @@ router.post("/update_image", parser.single("image"), getCurrentUser, getCurrentG
     user.image = req.file.url;
     console.log(user);
     user.save((err, doc) => {
+        if (err) {console.error(err)}
         res.status(200).json({
             success: true,
             image: req.file.url,

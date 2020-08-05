@@ -15,6 +15,7 @@ router.post("/signup", signup, (req, res) => {
     const user = res.locals.user;
 
     user.save((err, doc) => {
+        if (err) {console.error(err)}
         // create log
         console.log("* SIGNUP: created", user.id, new Date().toISOString());
         log("SIGNUP", user._id.toString());
@@ -28,6 +29,7 @@ router.post("/login", checkPassword, login, (req, res) => {
     user.initialize();
 
     user.save((err, doc) => {
+        if (err) {console.error(err)}
         // create log
         log("LOGIN", user._id.toString());
         return;
@@ -38,6 +40,7 @@ router.post("/login_sns", loginSNS, (req, res) => {
     const user = res.locals.user;
     
     user.save((err, doc) => {
+        if (err) {console.error(err)}
         // create log
         log("LOGIN", user._id.toString());
         return;
@@ -64,6 +67,7 @@ router.get("/logout", getCurrentUser, (req, res) => {
     user.initialize();
     
     user.save((err, doc) => {
+        if (err) {console.error(err)}
         log("LOGOUT", doc._id.toString());
     });
 })

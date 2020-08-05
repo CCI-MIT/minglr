@@ -17,11 +17,15 @@ function getGroups(groups) {
 
         const last = groups.length - 1;
 
+        console.log(groups);
+
         groups.forEach(function(group, i) {
             Group.findById(group._id).then(g => {
                 result.push(g.getData());
 
                 if (i === last) {
+                    console.log("result");
+                    console.log(result);
                     resolve(result);
                 }
             })
@@ -82,6 +86,7 @@ router.get("/group/:group_id", getCurrentUser, (req, res) => {
                 if (group.activeMembers.filter(m => m._id.equals(user._id)).length === 0)
                     group.activeMembers.unshift(user._id);
                 group.save((err, doc) => {
+                    if (err) {console.error(err)}
 
                     // send response
                     res.json({
@@ -123,8 +128,10 @@ router.post("/create_group", getCurrentUser, (req, res) => {
     });
 
     group.save((err, doc) => {
+        if (err) {console.error(err)}
         user.createdGroups.unshift(group._id);
         user.save((err, doc) => {
+            if (err) {console.error(err)}
             return res.json({
                 success: true,
             });

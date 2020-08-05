@@ -127,6 +127,7 @@ groupIO.on("connection", (socket) => {
                     user.save((err, doc) => {
                         currentUser.followings.unshift(user._id);
                         currentUser.save((err, doc) => {
+                            if (err) {console.error(err)}
                             next({
                                 success: true,
                                 currentUser: currentUser.getData(),

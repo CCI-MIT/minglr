@@ -44,7 +44,7 @@ router.post("/login_sns", loginSNS, (req, res) => {
     })
 })
 
-router.get("/logout", getCurrentUser, getCurrentGroup, (req, res) => {
+router.get("/logout", getCurrentUser, (req, res) => {
     const user = res.locals.user;
     
     res.status(200)
@@ -53,10 +53,12 @@ router.get("/logout", getCurrentUser, getCurrentGroup, (req, res) => {
         success: true
     });
 
-    const io = req.app.get("io"); 
-    const groupIO = io.of(`/group${user.available.toString()}`);
-    groupIO.emit("greet", remove(user.id));
-    groupIO.emit("approach", remove(user.id));
+    if (user.available) {
+        const io = req.app.get("io"); 
+        const groupIO = io.of(`/group${user.available.toString()}`);
+        groupIO.emit("greet", remove(user.id));
+        groupIO.emit("approach", remove(user.id));
+    }
 
     user.deactivate();
     user.initialize();

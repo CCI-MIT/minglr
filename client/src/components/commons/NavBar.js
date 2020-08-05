@@ -20,7 +20,7 @@ function NavBar(props) {
                 props.history.push("/login");
             } 
             else {
-                alert('Log Out Failed');
+                alert(response.data.message);
                 document.getElementById("logoutBtn").classList.remove("disabled")
             }
         });

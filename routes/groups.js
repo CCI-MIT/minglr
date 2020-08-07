@@ -11,39 +11,27 @@ const { getCurrentUser } = require("../middleware/getCurrentUser");
 
 const router = express.Router();
 
-function getGroups(groups) {
-    return new Promise(function(resolve, reject) {
-        let result = [];
+async function getGroups(groups) {
 
-        const last = groups.length - 1;
+    let groupArray = await Promise.all(
+        groups.map(group_id => {
+            return Group.findOne(
+                { _id: group_id },
+            );
+        })
+    );
 
-        console.log(groups);
-
-        groups.forEach(function(group, i) {
-            Group.findById(group._id).then(g => {
-                result.push(g.getData());
-
-                if (i === last) {
-                    console.log("result");
-                    console.log(result);
-                    resolve(result);
-                }
-            })
-        });
-
-        if (last < 0)
-            resolve([]);
-    });
+    return groupArray;
 }
 
 router.get("/groups", getCurrentUser, async (req, res) => {
     try {
         const currentUser = res.locals.user;
 
-        if (currentUser.available) {
-            deactivate(currentUser.available, currentUser._id);
-            currentUser.available = undefined;
-        }
+        // if (currentUser.available) {
+        //     deactivate(currentUser.available, currentUser._id);
+        //     currentUser.available = undefined;
+        // }
 
         await getGroups(currentUser.joinedGroups).then(async joinedGroups => {
             await getGroups(currentUser.createdGroups).then(createdGroups => {
@@ -77,14 +65,15 @@ router.get("/group/:group_id", getCurrentUser, (req, res) => {
                 // if id is not in joined or created groups, add the group_id to joined groups
                 // and add the user_id to members
                 if (!user.isIn(group_id)) {
-                    user.joinedGroups.unshift(group._id);
-                    group.members.unshift(user._id);
+                    user.joinedGroups.push(group._id);
+                    group.members.push(user._id);
                 }
 
                 // set group_id as available
                 user.available = group._id;
                 if (group.activeMembers.filter(m => m._id.equals(user._id)).length === 0)
-                    group.activeMembers.unshift(user._id);
+                    group.activeMembers.push(user._id);
+
                 group.save((err, doc) => {
                     if (err) {console.error(err)}
 

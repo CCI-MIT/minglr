@@ -1,10 +1,12 @@
 import React from 'react';
+import { withAlert } from 'react-alert'
+import axios from "axios";
+
 import Approach from "../containers/Approach";
 import Greet from "../containers/Greet";
 import NavBar from "../commons/NavBar";
 import Loader from "../commons/Loader";
 import Modal from "../commons/Modal";
-import axios from "axios";
 
 const io = require('socket.io-client');
 let socket = null;
@@ -27,8 +29,11 @@ class Group extends React.Component {
         this.handleFinishConfirm = this.handleFinishConfirm.bind(this);
         this.showJoinCall = this.showJoinCall.bind(this);
 
+        this.jitsiContainer = React.createRef();
+
         this.state = {
             loading: true,
+            loadingCall: false,
             mode: localStorage.getItem("mode") || "",
         };
     }
@@ -36,10 +41,13 @@ class Group extends React.Component {
         try {
             const domain = 'meet.jit.si';
 
+            console.log(this.jitsiContainer);
+            console.log(window.JitsiMeetExternalAPI);
+
             const options = {
                 roomName: localStorage.getItem("room"),
                 height: 500,
-                parentNode: this.refs.jitsiContainer,
+                parentNode: this.jitsiContainer.current,
                 interfaceConfigOverwrite: {
                     filmStripOnly: false,
                     MOBILE_APP_PROMO: false,
@@ -64,7 +72,7 @@ class Group extends React.Component {
             this.api.addEventListener('videoConferenceJoined', () => {
                 this.setState(prevState => ({
                     ...prevState,
-                    loading: false,
+                    loadingCall: false,
                 }), () => {
                     axios.get("/api/calling");
                     let myName = currentUser.firstname + " " + currentUser.lastname;
@@ -87,7 +95,7 @@ class Group extends React.Component {
 
         this.setState(prevState => ({
             ...prevState,
-            loading: true,
+            loadingCall: true,
             mode: "call"
         }), () => {
             this.startConference();
@@ -216,6 +224,7 @@ class Group extends React.Component {
         await axios.get(`/api/group/${this.props.match.params.id}`).then(response => {
             if (response.data.success) {
                 socket = io.connect(`/group${this.props.match.params.id}`);
+                this.handleConnection();
 
                 this.setState(prevState => ({
                     ...prevState,
@@ -230,84 +239,94 @@ class Group extends React.Component {
     }
 
     handleConnection = () => {
-        if (socket) {
-            socket.on("reconnect", () => {
-                alert.show("Successfully reconnected");
-            })
+        const { alert } = this.props;
 
-            socket.on("clientDisconnect", () => {
-                count += 1;
-                console.log("disconnected", count);
-                if (count === 1) {
-                    alert.show('Disconnected. Please refresh your browser if it does not reconnect automatically.')
+        socket.once("reconnect", () => {
+            alert.show("Successfully reconnected");
+        })
+
+        socket.once("clientDisconnect", () => {
+            count += 1;
+            console.log("disconnected", count);
+            if (count === 1) {
+                alert.show('Disconnected. Please refresh your browser if it does not reconnect automatically.')
+            }
+            else if (count === 4) {
+                count = 0;
+            }
+        });
+
+        socket.once("finishCall", async () => {
+            // call -> finished
+            this.handleFinish();
+        })
+
+        socket.once("cancelled", () => {
+            // waiting -> cancelled
+            console.log("cancelled")
+
+            localStorage.setItem("mode", "cancelled")
+            localStorage.setItem("room", "")
+
+            this.setState(prevState => ({
+                ...prevState,
+                mode: "cancelled"
+            }));
+        })
+
+        socket.once("createCall", () => {
+            // waiting -> call
+            // modal -> call
+            console.log("createCall")
+            const { mode } = this.state;
+
+            try {
+                if (mode !== "call" && window.JitsiMeetExternalAPI) {
+                    this.setState(prevState => ({
+                        ...prevState,
+                        loadingCall: true,
+                        mode: "call",
+                    }), () => {
+                        this.startConference();
+                    });
                 }
-                else if (count === 4) {
-                    count = 0;
+
+            } catch (err) {console.error(err)}
+        });
+
+        socket.once("waitCall", data => {
+            // accept request -> waiting
+            console.log(data);
+            const { mode } = this.state;
+            try {
+                if (mode !== "waiting") {
+                    localStorage.setItem("name", data.name);
+                    localStorage.setItem("room", data.room);
+                    localStorage.setItem("mode", "waiting");
+
+                    this.setState(prevState => ({
+                        ...prevState,
+                        mode: "waiting",
+                    }));
+
+                    // click on approach tab
+                    document.getElementById("tab-1").checked = true;
+                    document.getElementById("tab-2").checked = false;
                 }
-            });
+                else alert.show('Please wait for a minute');
 
-            socket.on("finishCall", async () => {
-                // call -> finished
-                this.handleFinish();
-            })
+            } catch (err) {console.error(err)}
+        });
+    }
 
-            socket.on("cancelled", () => {
-                // waiting -> cancelled
-                console.log("cancelled")
-
-                localStorage.setItem("mode", "cancelled")
-                localStorage.setItem("room", "")
-
-                this.setState(prevState => ({
-                    ...prevState,
-                    mode: "cancelled"
-                }));
-            })
-
-            socket.on("createCall", () => {
-                // waiting -> call
-                // modal -> call
-                console.log("createCall")
-                const { mode } = this.state;
-
-                try {
-                    if (mode !== "call" && window.JitsiMeetExternalAPI) {
-                        this.setState(prevState => ({
-                            ...prevState,
-                            loading: true,
-                            mode: "call",
-                        }), () => {
-                            this.startConference();
-                        });
-                    }
-
-                } catch (err) {console.error(err)}
-            });
-
-            socket.on("waitCall", data => {
-                // accept request -> waiting
-                console.log(data);
-                const { mode } = this.state;
-                try {
-                    if (mode !== "waiting" && window.JitsiMeetExternalAPI) {
-                        localStorage.setItem("name", data.name);
-                        localStorage.setItem("room", data.room);
-                        localStorage.setItem("mode", "waiting");
-
-                        this.setState(prevState => ({
-                            ...prevState,
-                            mode: "waiting",
-                        }));
-
-                        // click on approach tab
-                        document.getElementById("tab-1").checked = true;
-                        document.getElementById("tab-2").checked = false;
-                    }
-                    else alert('Please wait for a minute');
-
-                } catch (err) {console.error(err)}
-            });
-        }
+    componentWillUnmount() {
+        socket.removeAllListeners();
+        socket.disconnect();
+        localStorage.setItem("mode", "");
+        this.setState(prevState => ({
+            ...prevState,
+            mode: "",
+        }))
     }
 
     componentDidMount() {
@@ -327,19 +346,18 @@ class Group extends React.Component {
             });
 
             this.authGroup();
+
+            console.log(this.jitsiContainer);
             
             if (mode === "call") {
                 this.startConference();
             }
-
-            this.handleConnection();
-
         }
         
     }
 
     render () {
-        const { loading, mode } = this.state;
+        const { loading, loadingCall, mode } = this.state;
         let returnThis = ""
 
         console.log(this.state);
@@ -355,13 +373,6 @@ class Group extends React.Component {
             // waiting for the counterpart to proceed/cancel
             returnThis = <Modal mode={mode} handleCancel={this.handleCancel}/>
         }
-        else if (mode === "call") {
-            // show the video chat
-            returnThis = <div className="jitsi">
-                <strong className="jitsi-loader">{loading ? <div>Waiting for the other...<Loader /></div> : ""}</strong>
-                <div className="jitsi-container" ref="jitsiContainer"></div>
-            </div>
-        }
         else if (mode === "modal") {
             // show modal to give choice of proceed/cancel
             returnThis = <Modal mode={mode} handleProceed={this.handleProceed} handleCancel={this.handleCancel} />
@@ -376,12 +387,17 @@ class Group extends React.Component {
                     <main className="tabPanel-widget">
                         <label className="mobile-nav" htmlFor="tab-1" tabIndex="0"></label>
                         <input className="mobile-nav" id="tab-1" type="radio" name="tabs" defaultChecked aria-hidden="true"/>
+                        
                         <h2 className="mobile-nav">
                             {mode === "call" ? "You're on a call" : "I'd like to talk to"}
                         </h2>
                         
                         <div className="approach">
                             {returnThis}
+                            <div className={mode === "call" ? "jitsi" : "jitsi hidden"}>
+                                <strong className="jitsi-loader">{loadingCall ? <div>Waiting for the other...<Loader /></div> : ""}</strong>
+                                <div className="jitsi-container" ref={this.jitsiContainer}></div>
+                            </div>
                             <Approach {...this.props} showJoinCall={this.showJoinCall} socket={socket}/>
                         </div>
 
@@ -397,4 +413,4 @@ class Group extends React.Component {
     }
 }
 
-export default Group
+export default withAlert()(Group)

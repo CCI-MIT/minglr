@@ -36,7 +36,7 @@ const setMatchedInformation = (currentUser, receiver) => {
         room: roomName,
         name: receiver.getName(),
     });
-    groupIO.to(receiver._id).emit("joinCall", {
+    groupIO.to(receiver._id.toString()).emit("joinCall", {
         room: roomName,
         name: currentUser.getName(),
     });
@@ -89,6 +89,9 @@ groupIO.on("connection", (socket) => {
                         // log
                         console.log("* MATCHED: ", receiver.id, "with", currentUser.id, new Date().toISOString());
                         log("MATCHED", current_id, receiver._id.toString());
+                        return next({
+                            success: true,
+                        })
                     });
                 }
 
@@ -123,9 +126,11 @@ groupIO.on("connection", (socket) => {
                     }
     
                     // create follow relationships
-                    user.followers.unshift(currentUser._id);
+                    user.followers.push(currentUser._id);
                     user.save((err, doc) => {
-                        currentUser.followings.unshift(user._id);
+                        if (err) {console.error(err)}
+
+                        currentUser.followings.push(user._id);
                         currentUser.save((err, doc) => {
                             if (err) {console.error(err)}
                             next({
@@ -183,7 +188,7 @@ groupIO.on("connection", (socket) => {
 
     socket.on("disconnect", () => {
         const current_id = cookie.parse(socket.handshake.headers.cookie).w_id;
-        console.log("SOCKET DISCONNECTED", current_id);
+        console.log("GROUP DISCONNECTED", current_id);
 
         isConnected = false;
 

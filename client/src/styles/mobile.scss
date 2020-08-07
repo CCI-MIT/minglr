@@ -1,4 +1,7 @@
   @media (max-width: 600px) {
+    .btn {
+        padding: 0 1rem;    
+    }
     nav.loggedIn {
         justify-content: flex-end;
         > img {

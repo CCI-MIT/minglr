@@ -1,13 +1,34 @@
 const { User } = require('../../schemas/User');
 
-const { createUser } = require("./createUser");
 const { login } = require("./login");
 
 let loginSNS = (req, res, next) => {
     try {
         User.findOne({ email: req.body.email }, (err, user) => {
             if (!user) {
-                return createUser(req, res, next);
+                let index = 0
+                User.findOne().sort({$natural: -1}).limit(1).exec(function(err, last){
+                    index = last.id + 1;
+                    const user = new User({
+                        firstname: req.body.firstname,
+                        lastname: req.body.lastname,
+                        image: req.body.image,
+                        email: req.body.email,
+                        id: index,
+                    });
+
+                    const token = user.activate(req.body.type);
+                    res.cookie("w_auth", token, { httpOnly: true })
+                        .status(200)
+                        .json({
+                            success: true,
+                            type: "SIGNUP",
+                            _id: user._id.toString(),
+                        });
+                    
+                    res.locals.user = user;
+                    next();
+                });
             }
             else {
                 res.locals.user = user;

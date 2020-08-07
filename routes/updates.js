@@ -95,7 +95,7 @@ router.post("/update", getCurrentUser, getCurrentGroup, (req, res) => {
     group.activeMembers.forEach((u) => {
         const _id = u._id.toString();
         if (_id !== current_id) {
-            if (user.followings.findIndex(f => f._id.toString() === _id) >= 0) {
+            if (user.isFollowing(_id)) {
                 groupIO.to(_id).emit("greet", data)
             }
             else {

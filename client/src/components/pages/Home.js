@@ -14,6 +14,7 @@ class Home extends Component {
           createdGroups: [],
           joinedGroups: [],
         };
+        this.getGroups = this.getGroups.bind(this);
     }
 
     getGroups = async () => {
@@ -39,7 +40,7 @@ class Home extends Component {
                 <tr key={group._id}>
                     <td>{group.name}</td>
                     <td>
-                        <div className="btn darkgray" onClick={() => {copyTextToClipboard("https://minglr-group.herokuapp.com/" + link)}}>Copy Link</div>
+                        <div className="btn darkgray" onClick={() => {copyTextToClipboard("https://minglr-group.herokuapp.com" + link)}}>Copy Link</div>
                     </td>
                     <td>
                         <Link className="btn" to={link}>Go to this group</Link>
@@ -63,15 +64,15 @@ class Home extends Component {
                     </tr>
                 </thead>
                 <tbody>
-                    <>{isCreate ?
-                        <GroupCreator/>
-                        :
-                        null
-                    }</>
                     <>{groups.length === 0 ? 
-                        <tr><td>None</td></tr>
+                        <tr><td colSpan="3">None</td></tr>
                         : 
                         groups.map(this.renderGroups)
+                    }</>
+                    <>{isCreate ?
+                        <GroupCreator getGroups={this.getGroups}/>
+                        :
+                        null
                     }</>
                 </tbody>
             </table>

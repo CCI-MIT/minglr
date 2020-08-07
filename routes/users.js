@@ -8,6 +8,20 @@ const { getCurrentGroup } = require("../middleware/getCurrentGroup");
 
 const router = express.Router();
 
+async function getUsers(users) {
+
+    let userArray = await Promise.all(
+        users.map(user_id => {
+            let user = User.findOne(
+                { _id: user_id },
+            );
+            return user.getData();
+        })
+    );
+
+    return userArray;
+}
+
 router.get("/users/:user_id", (req, res) => {
     const current_id = req.cookies.w_id;
 
@@ -18,7 +32,7 @@ router.get("/users/:user_id", (req, res) => {
                 message: "user not authorized",
             });
 
-        User.findOne({id: req.params.user_id}).then(clickedUser => { // followed user
+        User.findOne({id: req.params.user_id}).then(async clickedUser => { // followed user
 
             if (!clickedUser) {
                 return res.status(200).json({
@@ -27,41 +41,35 @@ router.get("/users/:user_id", (req, res) => {
                 })
             }
 
-            let newFollowers = [];
-
-            clickedUser.followers.forEach(function(_id) {
-                User.findById(_id).then(u => {
-                    // check if available == this room id
-                    newFollowers.push(u.getData());
-                })
-            });
-
-            if (clickedUser.matched) {
-                User.findById(clickedUser.matched).then(matchedUser => {
+            await getUsers(clickedUser.followers).then(newFollowers => {
+                if (clickedUser.matched) {
+                    User.findById(clickedUser.matched).then(matchedUser => {
+                        res.status(200).json({
+                            success: true,
+                            user: clickedUser.getData(),
+                            followers: newFollowers,
+                            matched: matchedUser.getData(),
+                        })
+                    })
+    
+                }
+                else {
                     res.status(200).json({
                         success: true,
                         user: clickedUser.getData(),
                         followers: newFollowers,
-                        matched: matchedUser.getData(),
                     })
-                })
+                }
+    
+                console.log("* CLICKED: ", clickedUser.id, "by", current_id, new Date().toISOString());
+                log("CLICKED", current_id, clickedUser._id);
+            })
 
-            }
-            else {
-                res.status(200).json({
-                    success: true,
-                    user: clickedUser.getData(),
-                    followers: newFollowers,
-                })
-            }
-
-            console.log("* CLICKED: ", clickedUser.id, "by", current_id, new Date().toISOString());
-            log("CLICKED", current_id, clickedUser._id);
         });
     } catch (err) {console.error(err)}
                 
 });
-router.get("/approach", getCurrentUser, getCurrentGroup, (req, res) => {
+router.get("/approach", getCurrentUser, getCurrentGroup, async (req, res) => {
     const user = res.locals.user;
     const group = res.locals.group;
 
@@ -70,63 +78,35 @@ router.get("/approach", getCurrentUser, getCurrentGroup, (req, res) => {
     let newRest = [];
     let newFollowings = [];
 
-    console.log(group.activeMembers);
-
-    const last = group.activeMembers.length - 1;
-
-    group.activeMembers.forEach(function(member, i) {
-        User.findById(member._id).then(u => {
-            console.log(u.lastname);
+    for (const member of group.activeMembers) {
+        await User.findById(member._id).then(u => {
             if (member._id.toString() == current_id || !u.available) {}
             else if (user.isFollowing(u._id)) {
-                newFollowings.push(u.getData())
+                newFollowings.push(u.getData());
             }
             else if (!user.isFollowedBy(u._id)) {
-                newRest.push(u.getData())
-            }
-            console.log(newRest);
-
-            if (i === last) {
-                return res.status(200).json({
-                    success: true,
-                    followings: newFollowings,
-                    rest: newRest
-                });
+                newRest.push(u.getData());
             }
         });
-    });
-
-    if (last < 0) {
-        return res.status(200).json({
-            success: true,
-            followings: [],
-            rest: [],
-        })
     }
-
-});
-
-router.get("/greet", getCurrentUser, getCurrentGroup, (req, res) => {
-    const user = res.locals.user;
-    const group = res.locals.group;
-
-    const current_id = user._id.toString();
-    
-    let newFollowers = [];
-    group.activeMembers.forEach(function(member) {
-        User.findById(member._id).then(u => {
-            if (member._id.toString() == current_id || !u.available || u.matched) {}
-            else if (user.isFollowedBy(u._id)) {
-                newFollowers.push(u.getData());
-            }
-        })
-    });
-
-    
 
     return res.status(200).json({
         success: true,
-        followers: newFollowers,
+        followings: newFollowings,
+        rest: newRest,
+    })
+
+});
+
+router.get("/greet", getCurrentUser, getCurrentGroup, async (req, res) => {
+    const user = res.locals.user;
+    // const group = res.locals.group;
+
+    await getUsers(user.followers).then(newFollowers => {
+        return res.status(200).json({
+            success: true,
+            followers: newFollowers,
+        });
     });
 });
 

@@ -36,6 +36,7 @@ function NavBar(props) {
                 <Link to="/"><img className="logo" src={require("../../images/logo.svg")} alt="logo"/></Link>
                 <div className="left-menu">
                     {/* <a className="btn" href="https://mit.zoom.us/j/92238074391?pwd=dnBydjN4TEhCUlF6VWxjTHg1NlViUT09" target="_blank" rel="noopener noreferrer">Go Back to Main Room</a> */}
+                    <Link to="/home" className="btn btn-white">Groups</Link>
                     <div id="logoutBtn" className="btn btn-white" onClick={logoutHandler}>Log Out</div> 
                     <div className="settings" onClick={settingsHandler}>
                         <img src={require("../../images/settings.png")} alt="settings" title="settings"/>

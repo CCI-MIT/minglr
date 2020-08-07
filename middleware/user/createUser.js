@@ -1,10 +1,12 @@
 const { User } = require('../../schemas/User');
 
-let createUser = (req, res, next) => {
+const createUser = (req, res, next) => {
     // calculate index
     let index = 0
     User.findOne().sort({$natural: -1}).limit(1).exec(function(err, last){
-        index = last.id + 1;
+        if (last) {
+            index = last.id + 1;
+        }
         const user = new User({
             firstname: req.body.firstname,
             lastname: req.body.lastname,
@@ -14,7 +16,7 @@ let createUser = (req, res, next) => {
         });
 
         const token = user.activate(req.body.type);
-        res.cookie("w_auth", token, { maxAge: 2 * 60 * 60 * 1000, httpOnly: true })
+        res.cookie("w_auth", token, { httpOnly: true })
             .status(200)
             .json({
                 success: true,

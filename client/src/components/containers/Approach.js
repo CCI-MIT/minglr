@@ -179,7 +179,7 @@ class Approach extends React.Component {
             const newUser = {
                 ...selected,
                 following: (data.following && data.following !== "unfollowing"),
-                matched: (data.matched && data.matched !== "unmatched") || data.user.matched,
+                matched: (data.matched && data.matched !== "unmatched"),
             };
 
             this.setState(prevState => ({

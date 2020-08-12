@@ -9,11 +9,11 @@ import Loader from "../commons/Loader";
 import Modal from "../commons/Modal";
 
 const io = require('socket.io-client');
-let socket = null;
-let count = 0;
 
 class Group extends React.Component {
 
+    count = 0;
+    socket = null;
     _isWaiting = false;
     _isMounted = false;
     _isFinished = false;
@@ -40,9 +40,6 @@ class Group extends React.Component {
     startConference = () => {
         try {
             const domain = 'meet.jit.si';
-
-            console.log(this.jitsiContainer);
-            console.log(window.JitsiMeetExternalAPI);
 
             const options = {
                 roomName: localStorage.getItem("room"),
@@ -205,6 +202,14 @@ class Group extends React.Component {
     componentWillUnmount() {
         this._isMounted = false;
 
+        this.socket.removeAllListeners();
+        this.socket.disconnect();
+        localStorage.setItem("mode", "");
+        this.setState(prevState => ({
+            ...prevState,
+            mode: "",
+        }))
+
         window.addEventListener("beforeunload", async function (e) {
             // Cancel the event
             e.preventDefault();
@@ -223,7 +228,7 @@ class Group extends React.Component {
     authGroup = async () => {
         await axios.get(`/api/group/${this.props.match.params.id}`).then(response => {
             if (response.data.success) {
-                socket = io.connect(`/group${this.props.match.params.id}`);
+                this.socket = io.connect(`/group${this.props.match.params.id}`);
                 this.handleConnection();
 
                 this.setState(prevState => ({
@@ -241,27 +246,27 @@ class Group extends React.Component {
     handleConnection = () => {
         const { alert } = this.props;
 
-        socket.once("reconnect", () => {
+        this.socket.once("reconnect", () => {
             alert.show("Successfully reconnected");
         })
 
-        socket.once("clientDisconnect", () => {
-            count += 1;
-            console.log("disconnected", count);
-            if (count === 1) {
+        this.socket.once("clientDisconnect", () => {
+            this.count += 1;
+            console.log("disconnected", this.count);
+            if (this.count === 1) {
                 alert.show('Disconnected. Please refresh your browser if it does not reconnect automatically.')
             }
-            else if (count === 4) {
-                count = 0;
+            else if (this.count === 4) {
+                this.count = 0;
             }
         });
 
-        socket.once("finishCall", async () => {
+        this.socket.once("finishCall", async () => {
             // call -> finished
             this.handleFinish();
         })
 
-        socket.once("cancelled", () => {
+        this.socket.once("cancelled", () => {
             // waiting -> cancelled
             console.log("cancelled")
 
@@ -274,7 +279,7 @@ class Group extends React.Component {
             }));
         })
 
-        socket.once("createCall", () => {
+        this.socket.once("createCall", () => {
             // waiting -> call
             // modal -> call
             console.log("createCall")
@@ -294,7 +299,7 @@ class Group extends React.Component {
             } catch (err) {console.error(err)}
         });
 
-        socket.once("waitCall", data => {
+        this.socket.once("waitCall", data => {
             // accept request -> waiting
             console.log(data);
             const { mode } = this.state;
@@ -317,16 +322,6 @@ class Group extends React.Component {
 
             } catch (err) {console.error(err)}
         });
-    }
-
-    componentWillUnmount() {
-        socket.removeAllListeners();
-        socket.disconnect();
-        localStorage.setItem("mode", "");
-        this.setState(prevState => ({
-            ...prevState,
-            mode: "",
-        }))
     }
 
     componentDidMount() {
@@ -398,14 +393,14 @@ class Group extends React.Component {
                                 <strong className="jitsi-loader">{loadingCall ? <div>Waiting for the other...<Loader /></div> : ""}</strong>
                                 <div className="jitsi-container" ref={this.jitsiContainer}></div>
                             </div>
-                            <Approach {...this.props} showJoinCall={this.showJoinCall} socket={socket}/>
+                            <Approach {...this.props} showJoinCall={this.showJoinCall} socket={this.socket}/>
                         </div>
 
                         <label className="mobile-nav" htmlFor="tab-2" tabIndex="0"></label>
                         <input className="mobile-nav" id="tab-2" type="radio" name="tabs" aria-hidden="true"/>
                         <h2 className="mobile-nav" >People who want to talk to you</h2>
 
-                        <Greet {...this.props} clickDisabled={mode.length > 0} socket={socket}/>
+                        <Greet {...this.props} clickDisabled={mode.length > 0} socket={this.socket}/>
                     </main>
                 }
             </div>

@@ -24,6 +24,7 @@ MINGLR is an experimental software system developed to explore ways of supportin
 2. Join [Heroku](https://heroku.com)
 3. Create new app on Heroku
 4. Go to settings of your app and set up Config Vars as follows:
+   - before this, you would need to work on [mongodb](mongodb.com), [cloudinary](https://cloudinary.com), [Google dev center](https://developers.google.com/identity/sign-in/web), and [Facebook dev center](https://developers.facebook.com/)
    ```
    MONGO_ID=your id at mongodb.com
    MONGO_PASSWORD=your password at mongodb.com
@@ -32,9 +33,9 @@ MINGLR is an experimental software system developed to explore ways of supportin
    GOOGLE=your OAuth key on Google developer tool
    FACEBOOK=your OAuth key on Facebook developer tool
    
-   CLOUD_KEY=your key on https://cloudinary.com/
-   CLOUD_SECRET=your secret key on https://cloudinary.com/
-   CLOUD_NAME=your cloud name on https://cloudinary.com/
+   CLOUD_KEY=your key on cloudinary.com
+   CLOUD_SECRET=your secret key on cloudinary.com
+   CLOUD_NAME=your cloud name on cloudinary.com
    
    EMAIL_ADDRESS=your email you would like to use for password recovery
    EMAIL_PASSWORD=password of the email above

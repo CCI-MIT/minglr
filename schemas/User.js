@@ -5,6 +5,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require("bcrypt")
 const saltRounds = 10 // step 0
 
+const { deactivate } = require("../libs/deactivate");
+
 const { Schema } = mongoose;
 
 const userSchema = new Schema({
@@ -38,35 +40,49 @@ const userSchema = new Schema({
     default: 0
   },
   token: String,
-  available: {
-    type: Boolean,
-    default: false,
-    required: true,
+  followings: [
+    {
+      user: { 
+        type: Schema.ObjectId, 
+        ref: 'User' 
+      },
+    }
+  ],
+  followers: [
+    {
+      user: { 
+        type: Schema.ObjectId, 
+        ref: 'User' 
+      },
+    }
+  ],
+  matched: {
+    type: Schema.ObjectId, 
+    ref: 'User' 
   },
   calling: {
     type: Boolean,
     default: false,
   },
-  matched: {
-    type: Schema.ObjectId, 
-    ref: 'User' 
+  available: {
+    type: Schema.ObjectId,
+    ref: 'Group'
   },
-  followings: [
-      {
-          user:{ 
-              type: Schema.ObjectId, 
-              ref: 'User' 
-          },
+  createdGroups: [
+    {
+      group: {
+        type: Schema.ObjectId,
+        ref: 'Group'
       }
-
+    }
   ],
-  followers: [
-      {
-          user:{ 
-              type: Schema.ObjectId, 
-              ref: 'User' 
-          },
+  joinedGroups: [
+    {
+      group: {
+        type: Schema.ObjectId,
+        ref: 'Group'
       }
+    }
   ],
   resetPasswordToken: String,
   resetPasswordExpires: Date,
@@ -102,6 +118,13 @@ userSchema.methods.comparePassword = function(plainPassword, next) {
       return next(err);
       next(null, isMatch); // should be true
   })
+}
+
+userSchema.methods.isIn = function(group_id) {
+  const isJoined = this.joinedGroups.findIndex(g => g._id.toString() === group_id.toString()) >= 0;
+  const isCreated = this.createdGroups.findIndex(g => g._id.toString() === group_id.toString()) >= 0;
+
+  return isJoined || isCreated;
 }
 
 // check if the current user is following a certain user
@@ -142,8 +165,6 @@ userSchema.methods.activate = function(type) {
   if (type === "GOOGLE")
       secret = process.env.GOOGLE
 
-  this.available = true;
-
   const token = this._id.toHexString()
   this.token = token;
 
@@ -151,7 +172,8 @@ userSchema.methods.activate = function(type) {
 }
 
 userSchema.methods.deactivate = function() {
-  this.available = false;
+  deactivate(this.available, this._id);
+  this.available = undefined;
   this.token = "";
 }
 

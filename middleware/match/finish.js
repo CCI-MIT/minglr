@@ -4,10 +4,13 @@ const { putBackMatchedUser, putBackUser } = require("../../libs/socketMethods");
 
 const finish = (req, res, next) => {
     const currentUser = res.locals.user;
-    const current_id = currentUser._id.toString();
-    const io = req.app.get("io"); 
-            
+    const group = res.locals.group;
+
+    const current_id = currentUser._id.toString();       
     currentUser.calling = false;
+
+    const io = req.app.get("io"); 
+    const groupIO = io.of(`/group${currentUser.available.toString()}`);
 
     /*
     * already finished
@@ -16,7 +19,7 @@ const finish = (req, res, next) => {
         currentUser.save();
 
         // put back the currentUser to others' lists
-        putBackUser(currentUser, io);
+        putBackUser(group.activeMembers, currentUser, groupIO);
 
         return res.status(200).json({
             message: "Already finished",
@@ -37,7 +40,7 @@ const finish = (req, res, next) => {
     })
 
     // send message
-    putBackMatchedUser(currentUser, matched_id, io);
+    putBackMatchedUser(group.activeMembers, currentUser, matched_id, groupIO);
 
     log("FINISHED", current_id, matched_id);
 }

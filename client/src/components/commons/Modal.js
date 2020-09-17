@@ -19,7 +19,7 @@ function Modal(props) {
             You've been matched {isName}: <br/>
             <span className={canProceed} onClick={handleProceed}>Click to PROCEED</span>
             <span className="btn lightgray" onClick={handleCancel}>Click to CANCEL</span>
-            <audio id="audio" src="sounds/alarm_matched.mp3" type="audio/mp3" autoPlay={true}></audio>
+            <audio id="audio" src="/sounds/alarm_matched.mp3" type="audio/mp3" autoPlay={true}></audio>
         </>
     }
     else if (mode === "finished") {

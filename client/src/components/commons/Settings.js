@@ -106,16 +106,16 @@ function Settings(props) {
             </form>
             <form onSubmit={onSubmitHandler}>
                 <label className="label">Your First Name</label>
-                <input type="link" value={firstname} onChange={onFirstnameHandler} />
+                <input type="text" value={firstname} onChange={onFirstnameHandler} />
                 <br />
                 <label className="label">Your Last Name</label>
-                <input type="link" value={lastname} onChange={onLastnameHandler} />
+                <input type="text" value={lastname} onChange={onLastnameHandler} />
                 <br />
                 <label className="label">Your Affiliation</label>
-                <input type="link" value={affiliation} onChange={onAffiliationHandler} />
+                <input type="text" value={affiliation} onChange={onAffiliationHandler} />
                 <br />
                 <label className="label">Research Interest Keywords</label>
-                <input type="link" value={keywords} onChange={onKeywordsHandler} />
+                <input type="text" value={keywords} onChange={onKeywordsHandler} />
                 <button className="btn" type="submit">Save</button>
             </form>
         </div>

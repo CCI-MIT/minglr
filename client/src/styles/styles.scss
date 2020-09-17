@@ -27,6 +27,9 @@ h1, h2, h3, h4, h5, h6 {
 .full-width {
     width: 100%;
 }
+.clickable {
+    cursor: pointer;
+}
 
 nav {
     max-width: 100%;
@@ -64,6 +67,26 @@ main {
     font-size: 1rem;
     border: 0;
     cursor: pointer;
+}
+.home {
+    padding: 1.5rem 2rem;
+    flex-direction: column;
+    .container {
+        margin-bottom: 1.5rem;
+        flex-direction: column;
+    }
+    table th:first-child,
+    table td:first-child {
+        width: 70%;
+    }
+    .groupCreator {
+        background-color: #efefef;
+        input {
+            width: 200px;
+            max-width: 100%;
+            padding: .95rem 1.5rem;
+        }
+    }
 }
 .approach {
     margin: 1.5rem 2rem 1.5rem 2rem;
@@ -107,7 +130,7 @@ main {
     }
 }
 .modal + .container,
-.jitsi + .container {
+.jitsi:not(.hidden) + .container {
     visibility: hidden;
     position: absolute;
     top: 0;
@@ -279,7 +302,6 @@ main {
     margin-left: .5rem;
     font-weight: 500;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    min-width: 150px;
     cursor: pointer;
     white-space: nowrap;
     display: inline-block;
@@ -518,3 +540,4 @@ nav {
 }
 
 @import "mobile.scss";
+@import "table.scss";

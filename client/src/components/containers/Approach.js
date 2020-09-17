@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 import Show from './Show';
 import User from "../commons/User";
 import Loader from "../commons/Loader";
-import Search from "../approach/Search";
+import Search from "../libs/Search";
 
 class Approach extends React.Component { 
     _isMounted = false;
@@ -179,7 +179,7 @@ class Approach extends React.Component {
             const newUser = {
                 ...selected,
                 following: (data.following && data.following !== "unfollowing"),
-                matched: (data.matched && data.matched !== "unmatched") || data.user.matched,
+                matched: (data.matched && data.matched !== "unmatched"),
             };
 
             this.setState(prevState => ({

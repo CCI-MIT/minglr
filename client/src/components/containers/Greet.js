@@ -18,7 +18,7 @@ class Greet extends React.Component {
     }
 
     getUsers = async () => {
-      await axios.get('/api/greet').then(response => {
+      await axios.get(`/api/greet`).then(response => {
           if (response.data.success) {
             const users = response.data.followers
             this.setState(prevState => ({ 
@@ -35,14 +35,19 @@ class Greet extends React.Component {
         const { clickDisabled } = this.state;
         const { socket } = this.props;
 
-        if (!clickDisabled) {
+        if (!clickDisabled && window.JitsiMeetExternalAPI) {
+            console.log("match emitted");
             socket.emit("match", {
                 receiver: id
             }, (response) => {
+                console.log(response);
                 if (!response.success) {
                     alert(response.message);
                 }
             });
+        }
+        else {
+            alert("Please wait for a minute and try again.");
         }
         
     }

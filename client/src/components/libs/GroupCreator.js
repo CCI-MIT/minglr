@@ -23,7 +23,7 @@ function GroupCreator(props) {
             console.log(response);
             if (response.data.success) {
                 setClicked(false);
-                this.props.getGroups();
+                props.getGroups();
             }
             else {
                 alert(response.data.message);

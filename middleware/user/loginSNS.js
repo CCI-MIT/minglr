@@ -8,7 +8,9 @@ let loginSNS = (req, res, next) => {
             if (!user) {
                 let index = 0
                 User.findOne().sort({$natural: -1}).limit(1).exec(function(err, last){
-                    index = last.id + 1;
+                    if (last)
+                        index = last.id + 1;
+                        
                     const user = new User({
                         firstname: req.body.firstname,
                         lastname: req.body.lastname,

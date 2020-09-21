@@ -16,7 +16,7 @@ function GroupCreator(props) {
     }
 
     const onSubmitHandler = async (e) => {
-        e.stopPropagation();
+        e.preventDefault();
         await axios.post("/api/create_group", {
             name: name
         }).then(response => {
@@ -40,12 +40,12 @@ function GroupCreator(props) {
                 <td colSpan="3">
                     <form onSubmit={onSubmitHandler}>
                         <input type="text" placeholder="Group Name" onChange={onChangeHandler}/>
-                        <button className="btn" type="submit">Create a Groupzzz</button>
+                        <button className="btn" type="submit">Create a Group</button>
                     </form>
                 </td>
                 :
                 <td className="clickable" colSpan="3" onClick={handleClick}> 
-                    <strong> + Create New group </strong>
+                    <strong> + Create New Group </strong>
                 </td>
             }
         </tr>

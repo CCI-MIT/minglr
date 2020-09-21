@@ -40,7 +40,7 @@ function GroupCreator(props) {
                 <td colSpan="3">
                     <form onSubmit={onSubmitHandler}>
                         <input type="text" placeholder="Group Name" onChange={onChangeHandler}/>
-                        <button className="btn" type="submit">Create a Groupz</button>
+                        <button className="btn" type="submit">Create a Groupzzz</button>
                     </form>
                 </td>
                 :

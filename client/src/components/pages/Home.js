@@ -35,7 +35,7 @@ class Home extends Component {
     }
 
     renderGroups = (group) => {
-        const protocol = location.protocol;
+        const protocol = window.location.protocol;
         const slashes = protocol.concat("//");
         const host = slashes.concat(window.location.hostname);
 

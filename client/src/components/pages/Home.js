@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 import { copyTextToClipboard } from "../../utils/copy";
 import axios from 'axios';
 
+
 class Home extends Component {
     constructor(props) {
         super(props);
@@ -40,7 +41,7 @@ class Home extends Component {
                 <tr key={group._id}>
                     <td>{group.name}</td>
                     <td>
-                        <div className="btn darkgray" onClick={() => {copyTextToClipboard("https://minglr-group.herokuapp.com" + link)}}>Copy Link</div>
+                        <div className="btn darkgray" onClick={() => {copyTextToClipboard(process.env.PUBLIC_URL + link)}}>Copy Link</div>
                     </td>
                     <td>
                         <Link className="btn" to={link}>Go to this group</Link>

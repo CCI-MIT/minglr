@@ -254,7 +254,8 @@ class Group extends React.Component {
             this.count += 1;
             console.log("disconnected", this.count);
             if (this.count === 1) {
-                alert.show('Disconnected. Please refresh your browser if it does not reconnect automatically.')
+                //alert.show('Disconnected. Please refresh your browser if it does not reconnect automatically.')
+                window.reload();
             }
             else if (this.count === 4) {
                 this.count = 0;

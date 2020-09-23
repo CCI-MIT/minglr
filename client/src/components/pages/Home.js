@@ -35,9 +35,9 @@ class Home extends Component {
     }
 
     renderGroups = (group) => {
-        let protocol = location.protocol;
-        let slashes = protocol.concat("//");
-        let host = slashes.concat(window.location.hostname);
+        const protocol = location.protocol;
+        const slashes = protocol.concat("//");
+        const host = slashes.concat(window.location.hostname);
 
         if (group) {
             const link = "/group/" + group._id;
@@ -45,7 +45,7 @@ class Home extends Component {
                 <tr key={group._id}>
                     <td>{group.name}</td>
                     <td>
-                        <div className="btn darkgray" onClick={() => {copyTextToClipboard(host + link)}}>Copy Link</div>
+                        <div className="btn darkgray" onClick={() => {copyTextToClipboard((host + link))}}>Copy Link</div>
                     </td>
                     <td>
                         <Link className="btn" to={link}>Go to this group</Link>

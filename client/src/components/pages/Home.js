@@ -41,7 +41,7 @@ class Home extends Component {
                 <tr key={group._id}>
                     <td>{group.name}</td>
                     <td>
-                        <div className="btn darkgray" onClick={() => {copyTextToClipboard(process.env.PUBLIC_URL + link)}}>Copy Link</div>
+                        <div className="btn darkgray" onClick={() => {copyTextToClipboard(process.env.DOMAIN + link)}}>Copy Link</div>
                     </td>
                     <td>
                         <Link className="btn" to={link}>Go to this group</Link>

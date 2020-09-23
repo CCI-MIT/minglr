@@ -109,7 +109,7 @@ function Login(props) {
                 
             <GoogleLogin
                 className="login-btn"
-                clientId="1006193047058-lilp4kmnae87jhd115dndli6oa2lan9r.apps.googleusercontent.com"
+                clientId="717027527409-sdjf9fk2o438n8bomagsktnb64bv0g06.apps.googleusercontent.com"
                 buttonText="Login with Google"
                 onSuccess={googleHandler}
                 onFailure={googleHandler}
@@ -118,7 +118,7 @@ function Login(props) {
 
             <FacebookLogin
                 cssClass="login-btn facebook"
-                appId="293092431727469"
+                appId="2797264473932478"
                 fields="first_name,last_name,email,picture"
                 callback={facebookHandler} 
             />

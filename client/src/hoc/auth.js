@@ -23,10 +23,15 @@ export default function (SpecificComponent, option) {
 
                 setUser(response.payload);
 
-                //Not Loggined in Status 
+
+
                 if (!response.payload.isAuth) {
                     // redirect to login
                     if (option === true) {
+                        //Not Loggined in Status
+                        console.log(" >" + window.location.path)
+                        sessionStorage.setItem("redirectURL", window.location.path);
+
                         props.history.push({
                             pathname: '/login',
                             state: {from: props.location.pathname},
@@ -40,7 +45,12 @@ export default function (SpecificComponent, option) {
                 else {
                     // redirect to home
                     if (option === false) {
-                        props.history.push('/home')
+                        let pathToGo = sessionStorage.getItem("redirectURL");
+                        if(pathToGo){
+                            props.history.push(pathToGo);
+                        } else {
+                            props.history.push('/home');
+                        }
                     }
                     else {
                         setLoading(false);

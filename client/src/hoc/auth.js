@@ -29,8 +29,8 @@ export default function (SpecificComponent, option) {
                     // redirect to login
                     if (option === true) {
                         //Not Loggined in Status
-                        console.log(" >" + window.location.path)
-                        sessionStorage.setItem("redirectURL", window.location.path);
+                        console.log(" >" + window.location.pathname)
+                        sessionStorage.setItem("redirectURL", window.location.pathname);
 
                         props.history.push({
                             pathname: '/login',

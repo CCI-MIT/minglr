@@ -47,6 +47,7 @@ export default function (SpecificComponent, option) {
                     if (option === false) {
                         let pathToGo = sessionStorage.getItem("redirectURL");
                         if(pathToGo){
+                            sessionStorage.removeItem("redirectURL");
                             props.history.push(pathToGo);
                         } else {
                             props.history.push('/home');

@@ -128,4 +128,54 @@ router.post("/create_group", getCurrentUser, (req, res) => {
     })
 })
 
+
+
+router.post("/mark_group_deleted", getCurrentUser, (req, res) => {
+    const user = res.locals.user;
+    const group_id =  req.body._id;
+
+    Group.findById(group_id).then(group => {
+        if (!group) {
+            return res.json({
+                success: false,
+                message: "The group does not exist",
+            });
+        }
+        group.isDeleted = true;
+
+        group.save((err, doc) => {
+            if (err) {
+                console.error(err)
+            }
+            return res.json({
+                success: true,
+            });
+        })
+    })
+})
+router.post("/update_group", getCurrentUser, (req, res) => {
+    const user = res.locals.user;
+    const name =  req.body.name;
+    const group_id =  req.body._id;
+
+    Group.findById(group_id).then(group => {
+        if (!group) {
+            return res.json({
+                success: false,
+                message: "The group does not exist",
+            });
+        }
+        group.name = name;
+
+        group.save((err, doc) => {
+            if (err) {
+                console.error(err)
+            }
+                return res.json({
+                    success: true,
+                });
+        })
+    })
+})
+
 module.exports = router;

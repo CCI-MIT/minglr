@@ -37,14 +37,14 @@ function GroupCreator(props) {
     return (
         <tr className="groupCreator">
             {clicked ?
-                <td colSpan="3">
+                <td colSpan="4">
                     <form onSubmit={onSubmitHandler}>
                         <input type="text" placeholder="Group Name" onChange={onChangeHandler}/>
                         <button className="btn" type="submit">Create a Group</button>
                     </form>
                 </td>
                 :
-                <td className="clickable" colSpan="3" onClick={handleClick}> 
+                <td className="clickable" colSpan="4" onClick={handleClick}>
                     <strong> + Create New Group </strong>
                 </td>
             }

@@ -77,7 +77,7 @@ main {
     }
     table th:first-child,
     table td:first-child {
-        width: 70%;
+        width: 50%;
     }
     .groupCreator {
         background-color: #efefef;
@@ -297,6 +297,29 @@ main {
     text-decoration: none;
     text-align: center;
     background: linear-gradient(45deg, #7236FF, #4f23bb);
+    color: #fff;
+    padding: 0 2rem;
+    margin-left: .5rem;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-block;
+    &.lightgray {
+        background: $gray;
+    }
+    &.darkgray {
+        background: #22313F;
+    }
+}
+
+.btnDelete {
+    border-radius: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-decoration: none;
+    text-align: center;
+    background: linear-gradient(45deg, #ff3647, #bb2323);
     color: #fff;
     padding: 0 2rem;
     margin-left: .5rem;

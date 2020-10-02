@@ -40,6 +40,7 @@ const userSchema = new Schema({
     default: 0
   },
   token: String,
+  isDeleted: Boolean,
   followings: [
     {
       user: { 

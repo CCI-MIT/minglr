@@ -5,6 +5,7 @@ const { Schema } = mongoose;
 
 const groupSchema = new Schema({
   name: String,
+  isDeleted: Boolean,
   creator: {
     type: Schema.ObjectId, 
     ref: 'User' 

@@ -20,7 +20,15 @@ function ResetPassword(props) {
             if (response.data.success) {
                 Cookies.set("w_id", response.data._id);
                 Cookies.set("w_authtype", response.data.authtype);
-                props.history.push('/home');
+
+                let pathToGo = localStorage.getItem("redirectURL");
+                if(pathToGo) {
+                    localStorage.removeItem("redirectURL");
+                    props.history.push(pathToGo);
+                }
+                else {
+                    props.history.push('/home');
+                }
             }
             else {
                 setMessage(response.data.message);

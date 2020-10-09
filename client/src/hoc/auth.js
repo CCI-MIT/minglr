@@ -29,8 +29,8 @@ export default function (SpecificComponent, option) {
                     // redirect to login
                     if (option === true) {
                         //Not Loggined in Status
-                        console.log(" >" + window.location.pathname)
-                        sessionStorage.setItem("redirectURL", window.location.pathname);
+                        //console.log(" >" + window.location.pathname)
+                        localStorage.setItem("redirectURL", window.location.pathname);
 
                         props.history.push({
                             pathname: '/login',
@@ -45,9 +45,9 @@ export default function (SpecificComponent, option) {
                 else {
                     // redirect to home
                     if (option === false) {
-                        let pathToGo = sessionStorage.getItem("redirectURL");
+                        let pathToGo = localStorage.getItem("redirectURL");
                         if(pathToGo){
-                            sessionStorage.removeItem("redirectURL");
+                            localStorage.removeItem("redirectURL");
                             props.history.push(pathToGo);
                         } else {
                             props.history.push('/home');

@@ -37,7 +37,7 @@ function App() {
           <Route exact path="/forgotpassword" component={Auth(ForgotPassword, false)} />
           <Route path="/resetpassword/:token" component={Auth(ResetPassword, false)} />
           <Route path="/validateregistration/:token" component={Auth(ValidateRegistration, false)} />
-          <Route path="/termsofuse" component={Auth(TermsOfService, false)} />
+          <Route exact path="/termsofuse" component={TermsOfService} />
         </Switch>
       </Provider>
     </Suspense>

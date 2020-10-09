@@ -10,9 +10,11 @@ const loginAfterEmailValidation = (req, res, next) => {
         user.update({
             validationHash: "",
             hasValidatedEmail: true
+        }).then(()=>{
+            res.locals.user = user;
+            next();
         });
-        res.locals.user = user;
-        next();
+
     });
 
 };

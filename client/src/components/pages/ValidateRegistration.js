@@ -31,7 +31,7 @@ function ResetPassword(props) {
     useEffect(() => {
 
         if (props.match.params.token) {
-            setTimeout(verifyToken, 5000);
+            setTimeout(verifyToken, 1000);
         }
 
     });

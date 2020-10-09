@@ -383,7 +383,7 @@ class Group extends React.Component {
                     <Loader />
                     :
                     <>
-                        <div style={{display:'flex', position: 'relative', marginTop: '10',alignItems:'center', justifyContent: 'center'}}>
+                        <div style={{display:'flex', position: 'relative', marginTop: '20px',alignItems:'center', justifyContent: 'center'}}>
                             <h2 style={{margin:'auto'}}>{this.state.groupName}</h2>
                         </div>
                         <main className="tabPanel-widget">

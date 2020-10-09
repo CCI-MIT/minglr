@@ -124,6 +124,8 @@ function Login(props) {
                 callback={facebookHandler} 
             />
 
+            <div>By creating an account you agree with our <Link to="/termsofuse"> terms of use</Link></div>
+
             <hr />
 
             <form className="login-container">

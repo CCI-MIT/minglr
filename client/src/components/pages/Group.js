@@ -7,6 +7,7 @@ import Greet from "../containers/Greet";
 import NavBar from "../commons/NavBar";
 import Loader from "../commons/Loader";
 import Modal from "../commons/Modal";
+import {Link} from "react-router-dom";
 
 const io = require('socket.io-client');
 
@@ -409,6 +410,11 @@ class Group extends React.Component {
 
                             <Greet {...this.props} clickDisabled={mode.length > 0} socket={this.socket}/>
                         </main>
+                        <div style={{display:'flex', position: 'relative', marginBottom: '20px',marginRight: '40px',alignItems:'flex-end', justifyContent: 'flex-end'}}>
+                            <div>
+                                <Link to="/termsofuse"> Terms of use</Link>
+                            </div>
+                        </div>
                     </>
                 }
             </div>

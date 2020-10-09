@@ -126,6 +126,7 @@ function Signup(props) {
                         required
                         placeholder="Confirm Password"/>
                 <span className="login-message">{Message}</span>
+                <div>By creating an account you agree with our <Link to="/termsofuse"> terms of use</Link></div>
                 <button id="submitBtn" type="submit" className="login-btn email" onClick={signupHandler}>Sign up with Email</button>
                 <span>or if you already have an account, <Link to="/login">go to log in</Link></span>
             </form>

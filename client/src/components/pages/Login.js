@@ -22,7 +22,8 @@ function Login(props) {
                 props.history.push('/home');
         }
         else {
-            alert("Login failed. Please try again.")
+            alert(data.message);
+            //alert("Login failed. Please try again.")
         }
     }
 

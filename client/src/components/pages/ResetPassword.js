@@ -21,7 +21,7 @@ function ResetPassword(props) {
                 email: Email,
                 password: Password,
             }).then(response => {
-                if (response.success) {
+                if (response.data.success) {
                     alert("Successfully updated.");
                 }
                 else {

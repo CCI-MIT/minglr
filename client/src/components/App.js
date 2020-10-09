@@ -7,6 +7,7 @@ import Consent from "./pages/Consent";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import ValidateRegistration from "./pages/ValidateRegistration"
 
 import { positions, Provider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
@@ -34,6 +35,7 @@ function App() {
 
           <Route exact path="/forgotpassword" component={Auth(ForgotPassword, false)} />
           <Route path="/resetpassword/:token" component={Auth(ResetPassword, false)} />
+          <Route path="/validateregistration/:token" component={Auth(ValidateRegistration, false)} />
 
         </Switch>
       </Provider>

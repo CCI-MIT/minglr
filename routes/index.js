@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const crypto = require("crypto");
 
 const { checkPassword } = require("../middleware/user/checkPassword");
 const { loginSNS } = require("../middleware/user/loginSNS");
@@ -10,17 +11,48 @@ const { getCurrentGroup } = require("../middleware/getCurrentGroup");
 
 const { log } = require("../libs/log");
 const { remove } = require("../libs/socket");
+const nodemailer = require("nodemailer");
+const nodemailerSendgrid = require('nodemailer-sendgrid');
+
+const EmailConfiguration = require("../utils/email");
 
 router.post("/signup", signup, (req, res) => {
     const user = res.locals.user;
+    user.validationHash = crypto.randomBytes(20).toString("hex");
+    user.hasValidatedEmail = false;
+    user.shouldCreateGroups = false;
 
     user.save((err, doc) => {
         if (err) {console.error(err)}
         // create log
         console.log("* SIGNUP: created", user.id, new Date().toISOString());
         log("SIGNUP", user._id.toString());
+        // send email
+        sendSignUpEmail(user);
     });
 });
+function sendSignUpEmail(user){
+
+    let transporter = nodemailer.createTransport(EmailConfiguration.getEmailSenderConfiguration());
+
+    const mailOptions = {
+        from: `${process.env.EMAIL_ADDRESS}`,
+        to: `${user.email}`,
+        subject: '[Minglr] Link To Validate Email',
+        text:
+            'You are receiving this because you (or someone else) have registered your email to a Minglr account.\n\n'
+            + 'Please click on the following link, or paste this into your browser to validate your email:\n\n'
+            + `https://${process.env.DOMAIN}/validateregistration/${user.validationHash}\n\n`
+            + 'If you did not request this, please ignore this email .\n',
+    };
+
+    transporter.sendMail(mailOptions, (err, response) => {
+        if (err) {
+            console.error(err);
+        }
+        return;
+    });
+}
 
 router.post("/login", checkPassword, login, (req, res) => {
     const user = res.locals.user;

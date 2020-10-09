@@ -34,6 +34,7 @@ class Group extends React.Component {
         this.state = {
             loading: true,
             loadingCall: false,
+            groupName: '',
             mode: localStorage.getItem("mode") || "",
         };
     }
@@ -234,6 +235,7 @@ class Group extends React.Component {
                 this.setState(prevState => ({
                     ...prevState,
                     loading: false,
+                    groupName : response.data.groupName
                 }));
             }
             else {
@@ -379,30 +381,35 @@ class Group extends React.Component {
                 <NavBar {...this.props}/>
                 {loading ? 
                     <Loader />
-                    : 
-                    <main className="tabPanel-widget">
-                        <label className="mobile-nav" htmlFor="tab-1" tabIndex="0"></label>
-                        <input className="mobile-nav" id="tab-1" type="radio" name="tabs" defaultChecked aria-hidden="true"/>
-                        
-                        <h2 className="mobile-nav">
-                            {mode === "call" ? "You're on a call" : "I'd like to talk to"}
-                        </h2>
-                        
-                        <div className="approach">
-                            {returnThis}
-                            <div className={mode === "call" ? "jitsi" : "jitsi hidden"}>
-                                <strong className="jitsi-loader">{loadingCall ? <div>Waiting for the other...<Loader /></div> : ""}</strong>
-                                <div className="jitsi-container" ref={this.jitsiContainer}></div>
-                            </div>
-                            <Approach {...this.props} showJoinCall={this.showJoinCall} socket={this.socket}/>
+                    :
+                    <>
+                        <div style={{display:'flex', position: 'relative', marginTop: '10',alignItems:'center', justifyContent: 'center'}}>
+                            <h2 style={{margin:'auto'}}>{this.state.groupName}</h2>
                         </div>
+                        <main className="tabPanel-widget">
+                            <label className="mobile-nav" htmlFor="tab-1" tabIndex="0"></label>
+                            <input className="mobile-nav" id="tab-1" type="radio" name="tabs" defaultChecked aria-hidden="true"/>
 
-                        <label className="mobile-nav" htmlFor="tab-2" tabIndex="0"></label>
-                        <input className="mobile-nav" id="tab-2" type="radio" name="tabs" aria-hidden="true"/>
-                        <h2 className="mobile-nav" >People who want to talk to you</h2>
+                            <h2 className="mobile-nav">
+                                {mode === "call" ? "You're on a call" : "I'd like to talk to"}
+                            </h2>
 
-                        <Greet {...this.props} clickDisabled={mode.length > 0} socket={this.socket}/>
-                    </main>
+                            <div className="approach">
+                                {returnThis}
+                                <div className={mode === "call" ? "jitsi" : "jitsi hidden"}>
+                                    <strong className="jitsi-loader">{loadingCall ? <div>Waiting for the other...<Loader /></div> : ""}</strong>
+                                    <div className="jitsi-container" ref={this.jitsiContainer}></div>
+                                </div>
+                                <Approach {...this.props} showJoinCall={this.showJoinCall} socket={this.socket}/>
+                            </div>
+
+                            <label className="mobile-nav" htmlFor="tab-2" tabIndex="0"></label>
+                            <input className="mobile-nav" id="tab-2" type="radio" name="tabs" aria-hidden="true"/>
+                            <h2 className="mobile-nav" >People who want to talk to you</h2>
+
+                            <Greet {...this.props} clickDisabled={mode.length > 0} socket={this.socket}/>
+                        </main>
+                    </>
                 }
             </div>
         );

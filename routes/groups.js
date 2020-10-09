@@ -80,6 +80,7 @@ router.get("/group/:group_id", getCurrentUser, (req, res) => {
                     // send response
                     res.json({
                         success: true,
+                        groupName: group.name
                     })
 
                     // connect to namespace of group id

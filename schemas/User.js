@@ -40,6 +40,9 @@ const userSchema = new Schema({
     default: 0
   },
   token: String,
+  validationHash: String,
+  hasValidatedEmail: Boolean,
+  shouldCreateGroups: Boolean,
   isDeleted: Boolean,
   followings: [
     {

@@ -59,8 +59,9 @@ groupIO.on("connection", (socket) => {
 
     socket.on("match", (data, next) => {
         try {
+            
             User.findOne({id: data.receiver}).then(receiver => {
-                // if already matched, return
+                 // if already matched, return
                 if (receiver.matched) {
                     return next({
                         success: false,
@@ -218,7 +219,7 @@ groupIO.on("connection", (socket) => {
                             currentUser.available = undefined;
                             currentUser.save();
                         }
-                    }, 5000)
+                    }, 100)
                     
                 }
             })

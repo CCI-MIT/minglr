@@ -35,6 +35,7 @@ class Greet extends React.Component {
         const { clickDisabled } = this.state;
         const { socket } = this.props;
 
+        console.log("MATCH CLICKED")
         if (!clickDisabled && window.JitsiMeetExternalAPI) {
             console.log("match emitted");
             socket.emit("match", {

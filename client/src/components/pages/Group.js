@@ -64,7 +64,9 @@ class Group extends React.Component {
             };
 
             const { currentUser } = this.props;
-            
+
+
+
             this.api = new window.JitsiMeetExternalAPI(domain, options);
 
             // add listener 
@@ -86,7 +88,11 @@ class Group extends React.Component {
                 console.log("videoConferenceLeft");
                 this.handleFinish();
             });
+
+
         } catch (err) { console.error(err); }
+
+
     }
 
     handleProceed = async () => {
@@ -187,6 +193,8 @@ class Group extends React.Component {
     }
 
     showJoinCall= (data) => {
+        //console.log("RECEIVED A joinCall");
+
         localStorage.setItem("name", data.name);
         localStorage.setItem("room", data.room);
         localStorage.setItem("mode", "modal");
@@ -212,19 +220,7 @@ class Group extends React.Component {
             mode: "",
         }))
 
-        window.addEventListener("beforeunload", async function (e) {
-            // Cancel the event
-            e.preventDefault();
-            // Chrome requires returnValue to be set
-            e.returnValue = '';
 
-            if (this.api) {
-                this.api.executeCommand('hangup');
-                this.handleFinish();
-            }
-
-            await axios.get("/api/unavailable");
-        });
     }
 
     authGroup = async () => {
@@ -258,7 +254,7 @@ class Group extends React.Component {
             console.log("disconnected", this.count);
             if (this.count === 1) {
                 //alert.show('Disconnected. Please refresh your browser if it does not reconnect automatically.')
-                window.reload();
+                window.location.reload();
             }
             else if (this.count === 4) {
                 this.count = 0;
@@ -303,9 +299,10 @@ class Group extends React.Component {
             } catch (err) {console.error(err)}
         });
 
-        this.socket.once("waitCall", data => {
+        this.socket.on("waitCall", data => {
             // accept request -> waiting
-            console.log(data);
+            //console.log("GOT A WAITCALL”")
+            //console.log(data);
             const { mode } = this.state;
             try {
                 if (mode !== "waiting") {
@@ -352,7 +349,23 @@ class Group extends React.Component {
                 this.startConference();
             }
         }
-        
+        //register before unload event on MOUNT
+        window.addEventListener("beforeunload", async function (e) {
+            // Cancel the event
+            e.preventDefault();
+            // Chrome requires returnValue to be set
+            e.returnValue = '';
+
+            localStorage.setItem("mode", "")
+            localStorage.setItem("name", "")
+
+            if (this.api) {
+                this.api.executeCommand('hangup');
+                this.handleFinish();
+            }
+
+            await axios.get("/api/unavailable");
+        });
     }
 
     render () {
@@ -394,6 +407,8 @@ class Group extends React.Component {
                             <h2 className="mobile-nav">
                                 {mode === "call" ? "You're on a call" : "I'd like to talk to"}
                             </h2>
+                            {mode === "call" ? null : <h3 className="mobile-nav">Auto refresh is on</h3> }
+
 
                             <div className="approach">
                                 {returnThis}

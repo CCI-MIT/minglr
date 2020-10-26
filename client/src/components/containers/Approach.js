@@ -16,6 +16,7 @@ class Approach extends React.Component {
         this.handleClick = this.handleClick.bind(this)
         this.follow = this.follow.bind(this)
         this.unfollow = this.unfollow.bind(this)
+        this.getUsers = this.getUsers.bind(this);
         
         this.state = { 
           isLoading: true,
@@ -294,6 +295,8 @@ class Approach extends React.Component {
         const { socket, showJoinCall } = this.props;
 
         this.getUsers();
+
+        setTimeout(this.getUsers,5000 + Math.random()*10 );
 
         if (this._isMounted) {
             socket.on("approach", data => {

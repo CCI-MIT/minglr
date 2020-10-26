@@ -24,6 +24,7 @@ async function getGroups(groups) {
     return groupArray;
 }
 
+const socketMap = {};
 router.get("/groups", getCurrentUser, async (req, res) => {
     try {
         const currentUser = res.locals.user;
@@ -84,8 +85,12 @@ router.get("/group/:group_id", getCurrentUser, (req, res) => {
                     })
 
                     // connect to namespace of group id
-                    const io = req.app.get("io"); 
-                    groupSocket(io, group_id)
+                    const io = req.app.get("io");
+                    let groupName = `/group${group_id}`;
+                    if(!socketMap[groupName]) {
+                        groupSocket(io, group_id)
+                        socketMap[groupName] = true;
+                    }
 
                     const groupIO = io.of(`/group${group_id}`);
                     addNewUser(doc.activeMembers, user, groupIO);

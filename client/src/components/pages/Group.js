@@ -245,11 +245,11 @@ class Group extends React.Component {
     handleConnection = () => {
         const { alert } = this.props;
 
-        this.socket.once("reconnect", () => {
+        this.socket.on("reconnect", () => {
             alert.show("Successfully reconnected");
         })
 
-        this.socket.once("clientDisconnect", () => {
+        this.socket.on("clientDisconnect", () => {
             this.count += 1;
             console.log("disconnected", this.count);
             if (this.count === 1) {
@@ -261,12 +261,12 @@ class Group extends React.Component {
             }
         });
 
-        this.socket.once("finishCall", async () => {
+        this.socket.on("finishCall", async () => {
             // call -> finished
             this.handleFinish();
         })
 
-        this.socket.once("cancelled", () => {
+        this.socket.on("cancelled", () => {
             // waiting -> cancelled
             console.log("cancelled")
 
@@ -279,7 +279,7 @@ class Group extends React.Component {
             }));
         })
 
-        this.socket.once("createCall", () => {
+        this.socket.on("createCall", () => {
             // waiting -> call
             // modal -> call
             console.log("createCall")

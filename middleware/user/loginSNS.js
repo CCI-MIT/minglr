@@ -4,6 +4,7 @@ const { login } = require("./login");
 
 let loginSNS = (req, res, next) => {
     try {
+
         User.findOne({ email: req.body.email }, (err, user) => {
             if (!user) {
                 let index = 0

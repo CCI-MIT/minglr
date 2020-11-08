@@ -121,6 +121,7 @@ router.post("/create_group", getCurrentUser, (req, res) => {
         name: req.body.name,
         creator: user._id,
     });
+    console.log(group);
 
     group.save((err, doc) => {
         if (err) {console.error(err)}

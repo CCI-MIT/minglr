@@ -65,7 +65,7 @@ function GroupEditor(props) {
     const slashes = protocol.concat("//");
     const host = slashes.concat(window.location.hostname);
     const group = props.group;
-    console.log(JSON.stringify(group));
+    //console.log(JSON.stringify(group));
 
     if (group) {
         const link = "/group/" + group._id;

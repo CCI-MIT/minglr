@@ -15,6 +15,7 @@ const nodemailer = require("nodemailer");
 const nodemailerSendgrid = require('nodemailer-sendgrid');
 
 const EmailConfiguration = require("../utils/email");
+const LinkedinUtils = require("../utils/linkedin");
 
 router.post("/signup", signup, (req, res) => {
     const user = res.locals.user;
@@ -78,6 +79,12 @@ router.post("/login_sns", loginSNS, (req, res) => {
         return;
     })
 })
+
+router.get("/getLinkedinData", (req, res) =>{
+    LinkedinUtils.getValidatedWithLinkedinUser(req.query.code)
+        .then((dataBack) => res.json(dataBack))
+
+});
 
 router.get("/logout", getCurrentUser, (req, res) => {
     const user = res.locals.user;

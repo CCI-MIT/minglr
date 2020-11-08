@@ -16,7 +16,10 @@ function GroupCreator(props) {
     }
 
     const onSubmitHandler = async (e) => {
+
+
         e.preventDefault();
+
         await axios.post("/api/create_group", {
             name: name
         }).then(response => {
@@ -40,7 +43,7 @@ function GroupCreator(props) {
                 <td colSpan="4">
                     <form onSubmit={onSubmitHandler}>
                         <input type="text" placeholder="Group Name" onChange={onChangeHandler}/>
-                        <button className="btn" type="submit">Create a Group</button>
+                        <button className="btn" type="submit" >Create a Group</button>
                     </form>
                 </td>
                 :

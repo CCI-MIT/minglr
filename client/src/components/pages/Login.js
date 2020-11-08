@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 import { GoogleLogin } from 'react-google-login';
 import FacebookLogin from 'react-facebook-login';
 import { Link } from "react-router-dom";
+import { LinkedIn } from 'react-linkedin-login-oauth2';
 
 function Login(props) {
 
@@ -74,6 +75,34 @@ function Login(props) {
         }
     }
 
+    const linkedInHandler = (response) => {
+        //console.log(response);
+        if(!response.code) {
+            alert("Linkedin OAuth failed. Please try again.")
+        }
+        else {
+            let code = response.code;
+            axios.get(`/api/getLinkedinData?code=${code}`, {}).then(data => {
+
+                let dataParsed = data.data;
+                const linkedInResponse = {
+                    type: "LINKEDIN",
+                    image: dataParsed.profileImage,
+                    firstname: dataParsed.firstName,
+                    lastname: dataParsed.lastName,
+                    email: dataParsed.email,
+                    token: code,
+                }
+
+                axios.post("/api/login_sns", linkedInResponse).then(data => {
+                    //console.log(data);
+                    responseHandler(data.data, "LINKEDIN")
+                })
+            })
+
+        }
+    }
+
     const loginHandler = async (e) => {
         e.target.disabled = true
         setLoading(true)
@@ -123,6 +152,26 @@ function Login(props) {
                 fields="first_name,last_name,email,picture"
                 callback={facebookHandler} 
             />
+
+            <LinkedIn
+                clientId="77rkr2euf8hsvc"
+                onFailure={linkedInHandler}
+                onSuccess={linkedInHandler}
+                redirectUri="http://localhost:3000/linkedin"
+                scope="r_liteprofile r_emailaddress"
+                renderElement={({ onClick, disabled }) => (
+                    <button onClick={onClick} disabled={disabled} style={{marginTop: "30px",marginBottom: "30px",
+                        width: "300px",
+                        paddingTop: "9px",
+                        cursor: "pointer",
+                        border: 0,
+                    backgroundColor: "#0077B5"}}>
+                        <img src={require("../../images/linkedin_login.png")} alt="Log in with Linked In" style={{ maxWidth: '180px' }} />
+                    </button>
+                )}
+            >
+
+            </LinkedIn>
 
             <div>By creating an account you agree with our <Link to="/termsofuse"> terms of use</Link></div>
 

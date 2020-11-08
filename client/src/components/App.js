@@ -9,6 +9,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ValidateRegistration from "./pages/ValidateRegistration"
 import TermsOfService from "./pages/TermsOfService";
+import { LinkedInPopUp } from 'react-linkedin-login-oauth2';
 
 import { positions, Provider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
@@ -38,6 +39,10 @@ function App() {
           <Route path="/resetpassword/:token" component={Auth(ResetPassword, false)} />
           <Route path="/validateregistration/:token" component={Auth(ValidateRegistration, false)} />
           <Route exact path="/termsofuse" component={TermsOfService} />
+          <Route exact path="/linkedin" component={LinkedInPopUp} />
+
+          getValidatedWithLinkedinUser
+
         </Switch>
       </Provider>
     </Suspense>

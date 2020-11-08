@@ -134,6 +134,7 @@ function Login(props) {
         setPassword(document.getElementById("password").value)
     })
 
+    let linkedCallbackURL = window.location.href + "linkedin";
     return (
         <div className="login-container">
                 
@@ -157,7 +158,7 @@ function Login(props) {
                 clientId="77rkr2euf8hsvc"
                 onFailure={linkedInHandler}
                 onSuccess={linkedInHandler}
-                redirectUri="http://localhost:3000/linkedin"
+                redirectUri={linkedCallbackURL}
                 scope="r_liteprofile r_emailaddress"
                 renderElement={({ onClick, disabled }) => (
                     <button onClick={onClick} disabled={disabled} style={{marginTop: "30px",marginBottom: "30px",

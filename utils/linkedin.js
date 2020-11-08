@@ -1,11 +1,12 @@
 const { URLSearchParams } = require('url')
 const fetch = require('node-fetch')
 
-const {LINKEDIN_SECRET} = process.env;
+const {LINKEDIN_SECRET, FULL_DOMAIN} = process.env;
 const LINKEDIN_ACCESS_TOKEN = `https://www.linkedin.com/oauth/v2/accessToken`
 const LINKEDIN_CLIENT_ID = '77rkr2euf8hsvc'
 const LINKEDIN_CLIENT_SECRET = LINKEDIN_SECRET;
-const LINKEDIN_RIDERECT_URI = 'http://localhost:3000/linkedin';
+
+const LINKEDIN_RIDERECT_URI = `${FULL_DOMAIN}/linkedin`;
 const LINKEDIN_NAME_URL = 'https://api.linkedin.com/v2/me'
 const LINKEDIN_IMG_URL ='https://api.linkedin.com/v2/me?projection=(id,firstName,lastName,emailAddress,profilePicture(displayImage~:playableStreams))';
 

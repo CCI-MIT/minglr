@@ -134,7 +134,7 @@ function Login(props) {
         setPassword(document.getElementById("password").value)
     })
 
-    let linkedCallbackURL = window.location.hostname + "/linkedin";
+    let linkedCallbackURL = window.location.protocol+"//" + window.location.hostname + "/linkedin";
     return (
         <div className="login-container">
                 

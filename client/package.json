@@ -19,6 +19,7 @@
     "react-device-detect": "^1.12.1",
     "react-dom": "^16.13.1",
     "react-facebook-login": "^4.1.1",
+    "react-ga": "^3.2.1",
     "react-google-login": "^5.1.20",
     "react-instantsearch-dom": "^6.5.0",
     "react-linkedin-login-oauth2": "^1.0.8",

@@ -13,6 +13,7 @@ import { LinkedInPopUp } from 'react-linkedin-login-oauth2';
 
 import { positions, Provider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
+import usePageTracking from "../utils/usePageTracker";
 
 const options = {
   timeout: 5000,
@@ -24,6 +25,7 @@ const options = {
 };
 
 function App() {
+  usePageTracking()
   return (
     <Suspense fallback={(<div>Loading...</div>)}>
       <Provider template={AlertTemplate} {...options}>

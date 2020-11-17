@@ -14,13 +14,13 @@ import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import promiseMiddleware from 'redux-promise';
 import ReduxThunk from 'redux-thunk';
-import ReactGA from 'react-ga';
+
 const createStoreWithMiddleware = applyMiddleware(promiseMiddleware, ReduxThunk)(createStore);
 
 
-const trackingId = "G-FQBQMJY156"; // Replace with your Google Analytics tracking ID
+ // Replace with your Google Analytics tracking ID
 
-ReactGA.initialize(trackingId);
+
 
 ReactDOM.render(
     <Provider

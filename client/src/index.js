@@ -18,7 +18,7 @@ import ReactGA from 'react-ga';
 const createStoreWithMiddleware = applyMiddleware(promiseMiddleware, ReduxThunk)(createStore);
 
 
-const trackingId = "G-FQBQMJY156"; // Replace with your Google Analytics tracking ID
+const trackingId = "253109048";"G-FQBQMJY156"; // Replace with your Google Analytics tracking ID
 ReactGA.initialize(trackingId);
 
 ReactDOM.render(

@@ -12,8 +12,8 @@ const usePageTracking = () => {
 
 
     useEffect(() => {
-        ReactGA.initialize(trackingId);
-        ReactGA.pageview(location.pathname + location.search);
+        //ReactGA.initialize(trackingId);
+        //ReactGA.pageview(location.pathname + location.search);
 
         ga4react.initialize().then((ga4) => {
             ga4.pageview(location.pathname + location.search)

@@ -17,7 +17,7 @@ const usePageTracking = () => {
 
         ga4react.initialize().then((ga4) => {
             ga4.pageview(location.pathname + location.search)
-            ga4.gtag('event','pageview',location.pathname + location.search) // or your custiom gtag event
+            //ga4.gtag('event','pageview',location.pathname + location.search) // or your custiom gtag event
         },(err) => {
             console.error(err)
         })

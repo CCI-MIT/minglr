@@ -29,6 +29,7 @@ class Group extends React.Component {
         this.handleFinish = this.handleFinish.bind(this);
         this.handleFinishConfirm = this.handleFinishConfirm.bind(this);
         this.showJoinCall = this.showJoinCall.bind(this);
+        this.handleEndCallOutsideJitsi = this.handleEndCallOutsideJitsi.bind(this);
 
         this.jitsiContainer = React.createRef();
 
@@ -94,13 +95,19 @@ class Group extends React.Component {
 
 
     }
+    handleEndCallOutsideJitsi = async()=>{
+        //this.api.
+        this.api.executeCommand('hangup');
+        //this.handleFinish();
+    }
 
     handleProceed = async () => {
         localStorage.setItem("mode", "call");
-
+        const name = localStorage.getItem("name");
         this.setState(prevState => ({
             ...prevState,
             loadingCall: true,
+            callName: name,
             mode: "call"
         }), () => {
             this.startConference();
@@ -284,6 +291,7 @@ class Group extends React.Component {
             // modal -> call
             console.log("createCall")
             const { mode } = this.state;
+            const name = localStorage.getItem("name");
 
             try {
                 if (mode !== "call" && window.JitsiMeetExternalAPI) {
@@ -291,6 +299,7 @@ class Group extends React.Component {
                         ...prevState,
                         loadingCall: true,
                         mode: "call",
+                        callName: name
                     }), () => {
                         this.startConference();
                     });
@@ -344,8 +353,9 @@ class Group extends React.Component {
             this.authGroup();
 
             console.log(this.jitsiContainer);
-            
-            if (mode === "call") {
+            const name = localStorage.getItem("name");
+            this.setState({callName: name})
+            if (mode === "call") {//???
                 this.startConference();
             }
         }
@@ -369,10 +379,11 @@ class Group extends React.Component {
     }
 
     render () {
-        const { loading, loadingCall, mode } = this.state;
+        const { loading, loadingCall, mode, callName } = this.state;
         let returnThis = ""
 
-        console.log(this.state);
+        //console.log(this.state);
+
         if (mode === "cancelled") {
             // show modal to inform that the request got canceled
             returnThis = <Modal mode={mode} handleCancelConfirm={this.handleCancelConfirm}/>
@@ -414,7 +425,11 @@ class Group extends React.Component {
                                 {returnThis}
                                 <div className={mode === "call" ? "jitsi" : "jitsi hidden"}>
                                     <strong className="jitsi-loader">{loadingCall ? <div>Waiting for the other...<Loader /></div> : ""}</strong>
+                                    {(!loadingCall )? (<div>Talking to : {callName}</div>):(null)}
                                     <div className="jitsi-container" ref={this.jitsiContainer}></div>
+                                    <div style={{display: "flex",
+                                        alignItems: "flex-end",
+                                        flexDirection: "column"}}><button class="btn" onClick={this.handleEndCallOutsideJitsi}>End call</button></div>
                                 </div>
                                 <Approach {...this.props} showJoinCall={this.showJoinCall} socket={this.socket}/>
                             </div>

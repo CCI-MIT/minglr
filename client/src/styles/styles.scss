@@ -1,6 +1,6 @@
 $dark-gray: #22313F !default;
 $light-gray: #FBFBFB !default;
-$gray: #cecece !default;
+$gray: #5b5263 !default;
 
 html, body {
     margin: 0;
@@ -198,7 +198,7 @@ main {
     }
     h4 {
         color: $gray;
-        font-weight: 400;
+        font-weight: 700;
         padding-bottom: 3px;
         border-bottom: 2px solid $light-gray;
     }

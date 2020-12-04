@@ -55,7 +55,7 @@ class Greet extends React.Component {
 
     renderUsers = (user) => {
         return (
-            <div key={user.id} onClick={() => this.match(user.id)} className="user">
+            <div key={user.id} id={`greet_${user.id}`} onClick={() => this.match(user.id)} className="user">
                 <User
                     user={user}
                     />

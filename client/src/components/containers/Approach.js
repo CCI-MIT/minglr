@@ -146,7 +146,7 @@ class Approach extends React.Component {
             const classes = "user " + isFollowing + " " + isSelected;
 
             return (
-                <div key={user.id} onClick={(e) => {this.follow(e, user)}} className={classes}>
+                <div key={user.id} id={`approach_${user.id}`} onClick={(e) => {this.follow(e, user)}} className={classes}>
                     <User user={user}
                         />
                 </div>

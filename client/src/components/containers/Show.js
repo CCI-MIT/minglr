@@ -95,7 +95,7 @@ class Show extends React.Component{
                             </div>
                         )}
                         {user.following ?
-                            <div className="btn" onClick={(e) => this.props.unfollow(e, user)}>Stop Waiting</div>
+                            <div className="btn" id={`stop_waiting_${user.id}`} onClick={(e) => this.props.unfollow(e, user)}>Stop Waiting</div>
                             :
                             ""
                         }

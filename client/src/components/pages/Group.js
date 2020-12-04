@@ -429,7 +429,7 @@ class Group extends React.Component {
                                     <div className="jitsi-container" ref={this.jitsiContainer}></div>
                                     <div style={{display: "flex",
                                         alignItems: "flex-end",
-                                        flexDirection: "column"}}><button class="btn" onClick={this.handleEndCallOutsideJitsi}>End call</button></div>
+                                        flexDirection: "column"}}><button class="btn"  id={"end_call"} onClick={this.handleEndCallOutsideJitsi}>End call</button></div>
                                 </div>
                                 <Approach {...this.props} showJoinCall={this.showJoinCall} socket={this.socket}/>
                             </div>

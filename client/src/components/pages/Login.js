@@ -190,7 +190,7 @@ function Login(props) {
                     placeholder="Your Password"
                     onChange={onPasswordHandler}
                     required/>
-                <button type="submit" className="login-btn email" onClick={loginHandler}>Log in with Email</button>
+                <button type="submit" className="login-btn email" id="loginWithEmail" onClick={loginHandler}>Log in with Email</button>
                 <span>Or <Link to="/signup">sign up with email</Link></span> <br />
                 <span><Link to="/forgotpassword">Forgot password</Link></span>
             </form>

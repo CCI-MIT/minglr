@@ -101,7 +101,7 @@ function GroupEditor(props) {
                                     </div>
                                 </td>
                                 <td>
-                                    <Link className="btn" to={link}>Go to this group</Link>
+                                    <Link className="btn" to={link} id={`go_to_group_${group._id}`}>Go to this group</Link>
                                 </td>
                             </>:(null)}
                     </>

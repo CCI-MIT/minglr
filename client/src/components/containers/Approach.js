@@ -147,7 +147,7 @@ class Approach extends React.Component {
 
             return (
                 <div key={user.id} id={`approach_${user.id}`} onClick={(e) => {this.follow(e, user)}} className={classes}>
-                    <User user={user}
+                    <User user={user} kind="approach"
                         />
                 </div>
             );

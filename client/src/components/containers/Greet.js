@@ -58,6 +58,7 @@ class Greet extends React.Component {
             <div key={user.id} id={`greet_${user.id}`} onClick={() => this.match(user.id)} className="user">
                 <User
                     user={user}
+                    kind="greet"
                     />
             </div>
         )

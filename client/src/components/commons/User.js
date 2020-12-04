@@ -1,7 +1,8 @@
 import React from 'react'
 
 function User(props) {
-    const { firstname, lastname, affiliation, image, following, keywords, matched } = props.user;
+    const { firstname, lastname, affiliation, image, following, keywords, matched, id } = props.user;
+    const kind = props.kind;
     return (
         <div>
             
@@ -9,7 +10,7 @@ function User(props) {
                 <img src={(image) ? image : require("../../images/default_user.jpeg")} alt={firstname} />
             </div>
             <div className="user_info">
-                <strong>
+                <strong id={`${kind}_${id}`}>
                     {firstname} {lastname} {props.me ? "(you)" : ""}
                     {matched ? <img className="talking" src={require("../../images/matched.png")} alt="talking" title="talking"/> : ""}
                 </strong>

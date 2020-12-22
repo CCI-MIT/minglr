@@ -62,3 +62,5 @@ MINGLR is an experimental software system developed to explore ways of supportin
 ### How to run Minglr locally
 1. Clone this repository
 2. `npm install && npm run dev`
+
+© Copyright 2020 Massachusetts Institute of Technology

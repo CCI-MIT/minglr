@@ -19,8 +19,16 @@ function Login(props) {
             Cookies.set("w_authtype", authtype);
             if (props.location.state && props.location.state.from)
                 props.history.push(props.location.state.from);
-            else
-                props.history.push('/home');
+            else {
+                console.log("Data")
+                console.log(JSON.stringify(data));
+                if(data.defaultGroup){
+                    props.history.push(`/group/${data.defaultGroup}`);
+                }
+                else {
+                    props.history.push('/home');
+                }
+            }
         }
         else {
             alert(data.message);

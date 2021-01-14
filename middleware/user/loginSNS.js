@@ -2,6 +2,7 @@ const { User } = require('../../schemas/User');
 
 const { login } = require("./login");
 
+const defaultGroup = (process.env.MINGLR_DEFAULT_PUBLIC_GROUP)?(process.env.MINGLR_DEFAULT_PUBLIC_GROUP):(false);
 let loginSNS = (req, res, next) => {
     try {
 
@@ -26,6 +27,7 @@ let loginSNS = (req, res, next) => {
                         .json({
                             success: true,
                             type: "SIGNUP",
+                            defaultGroup: defaultGroup,
                             _id: user._id.toString(),
                         });
                     

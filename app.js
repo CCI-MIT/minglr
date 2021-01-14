@@ -20,7 +20,7 @@ const connect = mongoose.connect(MONGO_URL, {
     useNewUrlParser: true, useUnifiedTopology: true,
     useCreateIndex: true, useFindAndModify: false
 })
-.then(() => console.log('MongoDB Connected...'))
+.then(() => {console.log('MongoDB Connected...');console.log("DATABASE: "+MONGO_URL)})
 .catch(err => console.error(err));
 // const connect = require("./schemas");
 // connect();

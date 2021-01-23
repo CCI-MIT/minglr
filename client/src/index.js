@@ -20,8 +20,6 @@ const createStoreWithMiddleware = applyMiddleware(promiseMiddleware, ReduxThunk)
 
  // Replace with your Google Analytics tracking ID
 
-
-
 ReactDOM.render(
     <Provider
         store={createStoreWithMiddleware(

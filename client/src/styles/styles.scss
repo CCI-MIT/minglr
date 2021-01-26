@@ -69,11 +69,12 @@ main {
     cursor: pointer;
 }
 .home {
-    padding: 1.5rem 2rem;
+    padding: 1rem;
     flex-direction: column;
     .container {
         margin-bottom: 1.5rem;
         flex-direction: column;
+        overflow: scroll;
     }
     table th:first-child,
     table td:first-child {
@@ -97,6 +98,12 @@ main {
     }
     .jitsi-loader {
         position: absolute;
+    }
+}
+@media (max-width: 600px) {
+    .approach {
+        margin: 0;
+        width: 100%;
     }
 }
 .greet {
@@ -357,7 +364,7 @@ nav {
     .btn-white {
         color: #fff;
         background: transparent;
-        margin-left: 1.2rem;
+        margin-left: .5rem;
         border: 1px solid #fff;
         transition: background-color .2s ease;
         &:hover {

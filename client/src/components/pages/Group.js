@@ -408,8 +408,9 @@ class Group extends React.Component {
                     <Loader />
                     :
                     <>
-                        <div style={{display:'flex', position: 'relative', marginTop: '20px',alignItems:'center', justifyContent: 'center'}}>
-                            <h2 style={{margin:'auto'}}>{this.state.groupName}</h2>
+                        <div style={{textAlign: 'center'}}>
+                            <h2 style={{margin:'0'}}>{this.state.groupName}</h2>
+                            {mode === "call" ? null : <small>Auto refresh is on</small> }
                         </div>
                         <main className="tabPanel-widget">
                             <label className="mobile-nav" htmlFor="tab-1" tabIndex="0"></label>
@@ -418,8 +419,6 @@ class Group extends React.Component {
                             <h2 className="mobile-nav">
                                 {mode === "call" ? "You're on a call" : "I'd like to talk to"}
                             </h2>
-                            {mode === "call" ? null : <h3 className="mobile-nav">Auto refresh is on</h3> }
-
 
                             <div className="approach">
                                 {returnThis}

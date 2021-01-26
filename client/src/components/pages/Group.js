@@ -409,8 +409,7 @@ class Group extends React.Component {
                     :
                     <>
                         <div style={{textAlign: 'center'}}>
-                            <h2 style={{margin:'0'}}>{this.state.groupName}</h2>
-                            {mode === "call" ? null : <small>Auto refresh is on</small> }
+                            <h2 style={{margin:'.5rem 0'}}>{this.state.groupName}</h2>
                         </div>
                         <main className="tabPanel-widget">
                             <label className="mobile-nav" htmlFor="tab-1" tabIndex="0"></label>

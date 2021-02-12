@@ -42,7 +42,7 @@ const finish = (req, res, next) => {
     // send message
     putBackMatchedUser(group.activeMembers, currentUser, matched_id, groupIO);
 
-    log("FINISHED", current_id, matched_id);
+    log("FINISHED", current_id, matched_id + " in " + group._id.toString());
 }
 
 module.exports = { finish }

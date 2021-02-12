@@ -15,6 +15,7 @@ const router = express.Router();
 */
 router.get("/proceed", getCurrentUser, getCurrentGroup, (req, res) => {
     const currentUser = res.locals.user;
+    const group = res.locals.group;
     const current_id = currentUser._id.toString();
     const matched_id = currentUser.matched.toString();
 
@@ -28,7 +29,7 @@ router.get("/proceed", getCurrentUser, getCurrentGroup, (req, res) => {
     const groupIO = io.of(`/group${currentUser.available.toString()}`);
     groupIO.to(matched_id).emit("createCall");
 
-    log("PROCEEDED", current_id, matched_id);
+    log("PROCEEDED", current_id, matched_id + " in " + group._id.toString());
 });
 // change user status as "calling": both proceeder and proceedee
 router.get("/calling", getCurrentUser, getCurrentGroup, (req, res) => {

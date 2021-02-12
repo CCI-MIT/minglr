@@ -31,7 +31,7 @@ const cancel = (req, res, next) => {
     
     
     // create log
-    log("CANCELLED", current_id, matched_id);
+    log("CANCELLED", current_id, matched_id + " in " + group._id.toString());
 }
 
 module.exports = { cancel }

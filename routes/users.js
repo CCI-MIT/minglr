@@ -62,7 +62,7 @@ router.get("/users/:user_id", (req, res) => {
                 }
     
                 console.log("* CLICKED: ", clickedUser.id, "by", current_id, new Date().toISOString());
-                log("CLICKED", current_id, clickedUser._id);
+                log("CLICKED", current_id, clickedUser._id.toString());
             })
 
         });

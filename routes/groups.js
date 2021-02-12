@@ -84,6 +84,9 @@ router.get("/group/:group_id", getCurrentUser, (req, res) => {
                         groupName: group.name
                     })
 
+                    // create a log object with id of the joined group
+                    log("JOINGROUP", group._id.toString() + " by " + user._id.toString());
+
                     // connect to namespace of group id
                     const io = req.app.get("io");
                     let groupName = `/group${group_id}`;
@@ -128,6 +131,10 @@ router.post("/create_group", getCurrentUser, (req, res) => {
         user.createdGroups.unshift(group._id);
         user.save((err, doc) => {
             if (err) {console.error(err)}
+
+            // create a log object with id of the create group
+            log("CREATEGROUP", group._id.toString() + " by " + user._id.toString());
+
             return res.json({
                 success: true,
             });

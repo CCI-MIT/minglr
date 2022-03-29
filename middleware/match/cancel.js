@@ -4,7 +4,7 @@ const { putBackMatchedUser } = require("../../libs/socketMethods");
 const cancel = (req, res, next) => {
     const currentUser = res.locals.user;
     const group = res.locals.group;
-    
+
     if (!currentUser.matched)
         return res.json({
             message: "Already canceled",
@@ -14,7 +14,7 @@ const cancel = (req, res, next) => {
     const matched_id = currentUser.matched.toString();
 
     // send cancellee the message
-    const io = req.app.get("io"); 
+    const io = req.app.get("io");
     const groupIO = io.of(`/group${currentUser.available.toString()}`);
     groupIO.to(matched_id).emit("cancelled");
 
@@ -28,8 +28,8 @@ const cancel = (req, res, next) => {
 
     // show canceller to others
     putBackMatchedUser(group.activeMembers, currentUser, matched_id, groupIO);
-    
-    
+
+
     // create log
     log("CANCELLED", current_id, matched_id);
 }

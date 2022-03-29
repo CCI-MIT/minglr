@@ -1,9 +1,9 @@
 const express = require("express");
 
-const { User } = require("../schemas/User");
-
 const { getCurrentUser } = require("../middleware/getCurrentUser");
+const { getCurrentGroup } = require("../middleware/getCurrentGroup");
 const { remove } = require("../libs/socket");
+const { deactivate } = require("../libs/deactivate");
 
 const router = express.Router();
 
@@ -29,45 +29,46 @@ const storage = cloudinaryStorage({
 
 const parser = multer({ storage: storage });
 
-router.post("/update_image", parser.single("image"), getCurrentUser, function (req, res) {
+router.post("/update_image", parser.single("image"), getCurrentUser, getCurrentGroup, function (req, res) {
     const user = res.locals.user;
+    const group = res.locals.group;
     const current_id = user._id.toString();
 
     user.image = req.file.url;
     console.log(user);
     user.save((err, doc) => {
+        if (err) {console.error(err)}
         res.status(200).json({
             success: true,
             image: req.file.url,
         });
 
         const io = req.app.get("io"); 
-        User.find({}, function(err, allUsers) {
-            if (err) console.error(err);
+        const groupIO = io.of(`/group${user.available.toString()}`);
+            
+        const data = {
+            type: "UPDATE_IMAGE",
+            _id: current_id,
+            image: req.file.url,
+        }
 
-            const data = {
-                type: "UPDATE_IMAGE",
-                _id: current_id,
-                image: req.file.url,
-            }
-
-            allUsers.forEach((u) => {
-                const _id = u._id.toString();
-                if (_id !== current_id) {
-                    if (user.isFollowing(_id)) {
-                        io.to(_id).emit("greet", data)
-                    }
-                    else {
-                        io.to(_id).emit("approach", data)
-                    }
+        group.activeMembers.forEach((u) => {
+            const _id = u._id.toString();
+            if (_id !== current_id) {
+                if (user.isFollowing(_id)) {
+                    groupIO.to(_id).emit("greet", data)
                 }
-            })
-        });
+                else {
+                    groupIO.to(_id).emit("approach", data)
+                }
+            }
+        })
     });
 });
 
-router.post("/update", getCurrentUser, (req, res) => {
+router.post("/update", getCurrentUser, getCurrentGroup, (req, res) => {
     const user = res.locals.user;
+    const group = res.locals.group;
     const current_id = user._id.toString();
 
     user.firstname = req.body.firstname;
@@ -80,52 +81,52 @@ router.post("/update", getCurrentUser, (req, res) => {
     });
 
     const io = req.app.get("io"); 
-    User.find({}, function(err, allUsers) {
-        if (err) console.error(err);
+    const groupIO = io.of(`/group${user.available.toString()}`);
 
-        const data = {
-            type: "UPDATE",
-            _id: current_id,
-            firstname: user.firstname,
-            lastname: user.lastname,
-            affiliation: user.affiliation,
-            keywords: user.keywords,
-        }
+    const data = {
+        type: "UPDATE",
+        _id: current_id,
+        firstname: user.firstname,
+        lastname: user.lastname,
+        affiliation: user.affiliation,
+        keywords: user.keywords,
+    }
 
-        allUsers.forEach((u) => {
-            const _id = u._id.toString();
-            if (_id !== current_id) {
-                if (user.followings.findIndex(f => f._id.toString() === _id) >= 0) {
-                    io.to(_id).emit("greet", data)
-                }
-                else {
-                    io.to(_id).emit("approach", data)
-                }
+    group.activeMembers.forEach((u) => {
+        const _id = u._id.toString();
+        if (_id !== current_id) {
+            if (user.isFollowing(_id)) {
+                groupIO.to(_id).emit("greet", data)
             }
-        })
-    });
+            else {
+                groupIO.to(_id).emit("approach", data)
+            }
+        }
+    })
 });
 
-router.get("/unavailable", getCurrentUser, (req, res) => {
+router.get("/unavailable", getCurrentUser, getCurrentGroup, (req, res) => {
     const currentUser = res.locals.user;
     const current_id = currentUser._id.toString();
-    currentUser.available = false;
+    const group = res.locals.group;
 
-    const io = req.app.get("io");
-    User.find({}, function(err, allUsers) {
-        allUsers.forEach((u) => {
-            const _id = u._id.toString();
-            if (_id !== current_id) {
-                if (currentUser.isFollowing(_id)) {
-                    io.to(_id).emit("greet", remove(currentUser.id));
-                }
-                else {
-                    io.to(_id).emit("approach", remove(currentUser.id));
-                }
+    const io = req.app.get("io"); 
+    const groupIO = io.of(`/group${currentUser.available.toString()}`);
+
+    group.activeMembers.forEach((u) => {
+        const _id = u._id.toString();
+        if (_id !== current_id) {
+            if (currentUser.isFollowing(_id)) {
+                groupIO.to(_id).emit("greet", remove(currentUser.id));
             }
-        });
+            else {
+                groupIO.to(_id).emit("approach", remove(currentUser.id));
+            }
+        }
     });
 
+    deactivate(group._id, current_id);
+    currentUser.available = undefined;
     currentUser.initialize();
     currentUser.save((err, doc) => {
         if (err) console.error(err);

@@ -12,6 +12,7 @@ function Signup(props) {
     const [Password, setPassword] = useState("");
     const [PasswordConfirm, setPasswordConfirm] = useState("");
     const [Message, setMessage] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     
     const onFirstnameHandler = (e) => {
         setFirstname(e.currentTarget.value)
@@ -63,7 +64,9 @@ function Signup(props) {
                 if (response.data.success) {
                     Cookies.set("w_id", response.data._id);
                     Cookies.set("w_authtype", "EMAIL");
-                    props.history.push('/home');
+                    //props.history.push('/home');
+                    setIsLoading(true);
+
                 }
                 else {
                     if (response.data.message)
@@ -80,17 +83,19 @@ function Signup(props) {
     }
 
     useEffect(() => {
-        setEmail(document.getElementById("email").value)
-        setFirstname(document.getElementById("firstname").value)
-        setLastname(document.getElementById("lastname").value)
-        setPassword(document.getElementById("password").value)
-        setPasswordConfirm(document.getElementById("passwordConfirm").value)
+        if(!isLoading) {
+            setEmail(document.getElementById("email").value)
+            setFirstname(document.getElementById("firstname").value)
+            setLastname(document.getElementById("lastname").value)
+            setPassword(document.getElementById("password").value)
+            setPasswordConfirm(document.getElementById("passwordConfirm").value)
+        }
     })
 
     return (
         <div>
             <NavBarOut/>
-
+            {!isLoading?
             <form className="login-container">
                 <h2>Create Account</h2>
                 <input onChange={onFirstnameHandler}
@@ -121,9 +126,25 @@ function Signup(props) {
                         required
                         placeholder="Confirm Password"/>
                 <span className="login-message">{Message}</span>
+                <div>By creating an account you agree with our <Link to="/termsofuse"> terms of use</Link></div>
                 <button id="submitBtn" type="submit" className="login-btn email" onClick={signupHandler}>Sign up with Email</button>
                 <span>or if you already have an account, <Link to="/login">go to log in</Link></span>
             </form>
+            :
+                <div style={{
+                    display: 'flex',
+                    position: 'relative',
+                    marginTop: '10',
+                    alignItems: 'center',
+                    flexDirection: 'column',
+                    justifyContent: 'center'
+                }}>
+
+                    <div style={{flex:1, marginTop: '35px'}}><h2 style={{margin: 'auto'}}>We just sent you an e-mail to confirm your address.</h2></div>
+
+                    <div style={{flex:1}}><h3 style={{margin:'auto'}}>Please click on the validation link in the e-mail to activate your Minglr account.</h3></div>
+                </div>
+            }
         </div>
     )
 }

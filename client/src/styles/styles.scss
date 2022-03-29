@@ -1,6 +1,6 @@
 $dark-gray: #22313F !default;
 $light-gray: #FBFBFB !default;
-$gray: #cecece !default;
+$gray: #5b5263 !default;
 
 html, body {
     margin: 0;
@@ -26,6 +26,9 @@ h1, h2, h3, h4, h5, h6 {
 
 .full-width {
     width: 100%;
+}
+.clickable {
+    cursor: pointer;
 }
 
 nav {
@@ -65,6 +68,27 @@ main {
     border: 0;
     cursor: pointer;
 }
+.home {
+    padding: 1rem;
+    flex-direction: column;
+    .container {
+        margin-bottom: 1.5rem;
+        flex-direction: column;
+        overflow: scroll;
+    }
+    table th:first-child,
+    table td:first-child {
+        width: 50%;
+    }
+    .groupCreator {
+        background-color: #efefef;
+        input {
+            width: 200px;
+            max-width: 100%;
+            padding: .95rem 1.5rem;
+        }
+    }
+}
 .approach {
     margin: 1.5rem 2rem 1.5rem 2rem;
     width: 66.6666%;
@@ -74,6 +98,12 @@ main {
     }
     .jitsi-loader {
         position: absolute;
+    }
+}
+@media (max-width: 600px) {
+    .approach {
+        margin: 0;
+        width: 100%;
     }
 }
 .greet {
@@ -107,7 +137,7 @@ main {
     }
 }
 .modal + .container,
-.jitsi + .container {
+.jitsi:not(.hidden) + .container {
     visibility: hidden;
     position: absolute;
     top: 0;
@@ -175,7 +205,7 @@ main {
     }
     h4 {
         color: $gray;
-        font-weight: 400;
+        font-weight: 700;
         padding-bottom: 3px;
         border-bottom: 2px solid $light-gray;
     }
@@ -279,7 +309,29 @@ main {
     margin-left: .5rem;
     font-weight: 500;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    min-width: 150px;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-block;
+    &.lightgray {
+        background: $gray;
+    }
+    &.darkgray {
+        background: #22313F;
+    }
+}
+
+.btnDelete {
+    border-radius: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-decoration: none;
+    text-align: center;
+    background: linear-gradient(45deg, #ff3647, #bb2323);
+    color: #fff;
+    padding: 0 2rem;
+    margin-left: .5rem;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     cursor: pointer;
     white-space: nowrap;
     display: inline-block;
@@ -312,7 +364,7 @@ nav {
     .btn-white {
         color: #fff;
         background: transparent;
-        margin-left: 1.2rem;
+        margin-left: .5rem;
         border: 1px solid #fff;
         transition: background-color .2s ease;
         &:hover {
@@ -518,3 +570,4 @@ nav {
 }
 
 @import "mobile.scss";
+@import "table.scss";

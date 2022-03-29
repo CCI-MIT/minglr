@@ -2,13 +2,18 @@ import React, { Suspense } from 'react';
 import { Route, Switch } from "react-router-dom";
 import Auth from "../hoc/auth";
 import Home from "./pages/Home";
+import Group from "./pages/Group";
 import Consent from "./pages/Consent";
 import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import ValidateRegistration from "./pages/ValidateRegistration"
+import TermsOfService from "./pages/TermsOfService";
+import { LinkedInPopUp } from 'react-linkedin-login-oauth2';
 
 import { positions, Provider } from "react-alert";
 import AlertTemplate from "react-alert-template-basic";
+import usePageTracking from "../utils/usePageTracker";
 
 const options = {
   timeout: 5000,
@@ -20,6 +25,7 @@ const options = {
 };
 
 function App() {
+  usePageTracking()
   return (
     <Suspense fallback={(<div>Loading...</div>)}>
       <Provider template={AlertTemplate} {...options}>
@@ -29,9 +35,15 @@ function App() {
           <Route exact path="/signup" component={Auth(Signup, false)} />
 
           <Route exact path="/home" component={Auth(Home, true)} />
+          <Route path="/group/:id" component={Auth(Group, true)} />
 
           <Route exact path="/forgotpassword" component={Auth(ForgotPassword, false)} />
           <Route path="/resetpassword/:token" component={Auth(ResetPassword, false)} />
+          <Route path="/validateregistration/:token" component={Auth(ValidateRegistration, false)} />
+          <Route exact path="/termsofuse" component={TermsOfService} />
+          <Route exact path="/linkedin" component={LinkedInPopUp} />
+
+          getValidatedWithLinkedinUser
 
         </Switch>
       </Provider>

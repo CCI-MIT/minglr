@@ -15,11 +15,12 @@ const webSocket = require("./socket");
 const mongoose = require("mongoose");
 const {MONGO_ID, MONGO_PASSWORD, MONGO_APPNAME, NODE_ENV} = process.env;
 const MONGO_URL = `mongodb+srv://${MONGO_ID}:${MONGO_PASSWORD}@${MONGO_APPNAME}.mongodb.net/test?retryWrites=true&w=majority`;
+
 const connect = mongoose.connect(MONGO_URL, {
     useNewUrlParser: true, useUnifiedTopology: true,
     useCreateIndex: true, useFindAndModify: false
 })
-.then(() => console.log('MongoDB Connected...'))
+.then(() => {console.log('MongoDB Connected...');console.log("DATABASE: "+MONGO_URL)})
 .catch(err => console.error(err));
 // const connect = require("./schemas");
 // connect();
@@ -40,12 +41,14 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 const indexRouter = require("./routes");
 const authRouter = require("./routes/auth");
 const usersRouter = require("./routes/users");
+const groupsRouter = require("./routes/groups");
 const matchRouter = require("./routes/match");
 const updatesRouter = require("./routes/updates");
 const resetPasswordRouter = require("./routes/reset_password");
 app.use('/api', indexRouter)
 app.use('/api', authRouter)
 app.use('/api', usersRouter)
+app.use('/api', groupsRouter)
 app.use('/api', matchRouter)
 app.use('/api', updatesRouter)
 app.use('/api', resetPasswordRouter)

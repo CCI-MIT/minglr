@@ -13,19 +13,25 @@ const createUser = (req, res, next) => {
             email: req.body.email,
             password: req.body.password,
             id: index,
-            available: true,
         });
 
-        const token = user.activate(req.body.type);
-        res.cookie("w_auth", token, { httpOnly: true })
-            .status(200)
-            .json({
-                success: true,
-                type: "SIGNUP",
-                _id: user._id.toString(),
-            });
-        
-        res.locals.user = user;
+        // if(req.body.password) {
+        //     const token = user.activate(req.body.type);
+        //     res.cookie("w_auth", token, {httpOnly: true})
+        //         .status(200)
+        //         .json({
+        //             success: true,
+        //             type: "SIGNUP",
+        //             _id: user._id.toString(),
+        //         });
+        //
+            res.locals.user = user;
+        // }
+        res.json({
+                         success: true,
+            //             type: "SIGNUP",
+            //             _id: user._id.toString(),
+                     });
         next();
     });
                 

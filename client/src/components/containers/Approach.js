@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 import Show from './Show';
 import User from "../commons/User";
 import Loader from "../commons/Loader";
-import Search from "../approach/Search";
+import Search from "../libs/Search";
 
 class Approach extends React.Component { 
     _isMounted = false;
@@ -16,6 +16,7 @@ class Approach extends React.Component {
         this.handleClick = this.handleClick.bind(this)
         this.follow = this.follow.bind(this)
         this.unfollow = this.unfollow.bind(this)
+        this.getUsers = this.getUsers.bind(this);
         
         this.state = { 
           isLoading: true,
@@ -145,8 +146,8 @@ class Approach extends React.Component {
             const classes = "user " + isFollowing + " " + isSelected;
 
             return (
-                <div key={user.id} onClick={(e) => {this.follow(e, user)}} className={classes}>
-                    <User user={user}
+                <div key={user.id} id={`approach_${user.id}`} onClick={(e) => {this.follow(e, user)}} className={classes}>
+                    <User user={user} kind="approach"
                         />
                 </div>
             );
@@ -179,7 +180,7 @@ class Approach extends React.Component {
             const newUser = {
                 ...selected,
                 following: (data.following && data.following !== "unfollowing"),
-                matched: (data.matched && data.matched !== "unmatched") || data.user.matched,
+                matched: (data.matched && data.matched !== "unmatched"),
             };
 
             this.setState(prevState => ({
@@ -294,6 +295,8 @@ class Approach extends React.Component {
         const { socket, showJoinCall } = this.props;
 
         this.getUsers();
+
+        setTimeout(this.getUsers,5000 + Math.random()*10 );
 
         if (this._isMounted) {
             socket.on("approach", data => {

@@ -19,6 +19,7 @@ function ForgotPassword(props) {
             setMessage("Please enter your email")
         }
         else {
+
             await axios.post("/api/forgot_password", {
                 email: Email,
             }).then(response => {

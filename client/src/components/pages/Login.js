@@ -5,6 +5,7 @@ import Cookies from 'js-cookie';
 import { GoogleLogin } from 'react-google-login';
 import FacebookLogin from 'react-facebook-login';
 import { Link } from "react-router-dom";
+import { LinkedIn } from 'react-linkedin-login-oauth2';
 
 function Login(props) {
 
@@ -16,10 +17,22 @@ function Login(props) {
         if (data.success) {
             Cookies.set("w_id", data._id);
             Cookies.set("w_authtype", authtype);
-            props.history.push('/home');
+            if (props.location.state && props.location.state.from)
+                props.history.push(props.location.state.from);
+            else {
+                console.log("Data")
+                console.log(JSON.stringify(data));
+                if(data.defaultGroup){
+                    props.history.push(`/group/${data.defaultGroup}`);
+                }
+                else {
+                    props.history.push('/home');
+                }
+            }
         }
         else {
-            alert("Login failed. Please try again.")
+            alert(data.message);
+            //alert("Login failed. Please try again.")
         }
     }
 
@@ -70,6 +83,34 @@ function Login(props) {
         }
     }
 
+    const linkedInHandler = (response) => {
+        //console.log(response);
+        if(!response.code) {
+            alert("Linkedin OAuth failed. Please try again.")
+        }
+        else {
+            let code = response.code;
+            axios.get(`/api/getLinkedinData?code=${code}`, {}).then(data => {
+
+                let dataParsed = data.data;
+                const linkedInResponse = {
+                    type: "LINKEDIN",
+                    image: dataParsed.profileImage,
+                    firstname: dataParsed.firstName,
+                    lastname: dataParsed.lastName,
+                    email: dataParsed.email,
+                    token: code,
+                }
+
+                axios.post("/api/login_sns", linkedInResponse).then(data => {
+                    //console.log(data);
+                    responseHandler(data.data, "LINKEDIN")
+                })
+            })
+
+        }
+    }
+
     const loginHandler = async (e) => {
         e.target.disabled = true
         setLoading(true)
@@ -101,12 +142,13 @@ function Login(props) {
         setPassword(document.getElementById("password").value)
     })
 
+    let linkedCallbackURL = window.location.protocol+"//" + window.location.hostname + "/linkedin";
     return (
         <div className="login-container">
                 
             <GoogleLogin
                 className="login-btn"
-                clientId="1006193047058-lilp4kmnae87jhd115dndli6oa2lan9r.apps.googleusercontent.com"
+                clientId="717027527409-sdjf9fk2o438n8bomagsktnb64bv0g06.apps.googleusercontent.com"
                 buttonText="Login with Google"
                 onSuccess={googleHandler}
                 onFailure={googleHandler}
@@ -115,10 +157,32 @@ function Login(props) {
 
             <FacebookLogin
                 cssClass="login-btn facebook"
-                appId="293092431727469"
+                appId="2797264473932478"
                 fields="first_name,last_name,email,picture"
                 callback={facebookHandler} 
             />
+
+            <LinkedIn
+                clientId="77rkr2euf8hsvc"
+                onFailure={linkedInHandler}
+                onSuccess={linkedInHandler}
+                redirectUri={linkedCallbackURL}
+                scope="r_liteprofile r_emailaddress"
+                renderElement={({ onClick, disabled }) => (
+                    <button onClick={onClick} disabled={disabled} style={{marginTop: "30px",marginBottom: "30px",
+                        width: "300px",
+                        paddingTop: "9px",
+                        cursor: "pointer",
+                        border: 0,
+                    backgroundColor: "#0077B5"}}>
+                        <img src={require("../../images/linkedin_login.png")} alt="Log in with Linked In" style={{ maxWidth: '180px' }} />
+                    </button>
+                )}
+            >
+
+            </LinkedIn>
+
+            <div>By creating an account you agree with our <Link to="/termsofuse"> terms of use</Link></div>
 
             <hr />
 
@@ -134,7 +198,7 @@ function Login(props) {
                     placeholder="Your Password"
                     onChange={onPasswordHandler}
                     required/>
-                <button type="submit" className="login-btn email" onClick={loginHandler}>Log in with Email</button>
+                <button type="submit" className="login-btn email" id="loginWithEmail" onClick={loginHandler}>Log in with Email</button>
                 <span>Or <Link to="/signup">sign up with email</Link></span> <br />
                 <span><Link to="/forgotpassword">Forgot password</Link></span>
             </form>

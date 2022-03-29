@@ -17,7 +17,7 @@ class Show extends React.Component{
     }
 
     getUserData = async (id) => {
-        await axios.get('api/users/' + id)
+        await axios.get('/api/users/' + id)
         .then(response => {
             console.log(response);
             this.setState({
@@ -95,7 +95,7 @@ class Show extends React.Component{
                             </div>
                         )}
                         {user.following ?
-                            <div className="btn" onClick={(e) => this.props.unfollow(e, user)}>Stop Waiting</div>
+                            <div className="btn" id={`stop_waiting_${user.id}`} onClick={(e) => this.props.unfollow(e, user)}>Stop Waiting</div>
                             :
                             ""
                         }

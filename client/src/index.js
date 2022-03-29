@@ -17,6 +17,11 @@ import ReduxThunk from 'redux-thunk';
 
 const createStoreWithMiddleware = applyMiddleware(promiseMiddleware, ReduxThunk)(createStore);
 
+
+ // Replace with your Google Analytics tracking ID
+
+
+
 ReactDOM.render(
     <Provider
         store={createStoreWithMiddleware(

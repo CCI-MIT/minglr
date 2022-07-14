@@ -8,8 +8,5 @@
         <text id="M-I-N-G-L-R" font-family="HiraginoSans-W6, Hiragino Sans" font-size="25" font-weight="500" letter-spacing="0.833333611" fill="#FFFFFF">
             <tspan x="2" y="26">M I N G L R</tspan>
         </text>
-        <text id="BETA" font-family="HiraginoSans-W7, Hiragino Sans" font-size="11" font-weight="bold" letter-spacing="0.8333336" fill="#FFFFFF">
-            <tspan x="168" y="13">BETA</tspan>
-        </text>
     </g>
 </svg>

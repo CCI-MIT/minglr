@@ -64,3 +64,17 @@ MINGLR is an experimental software system developed to explore ways of supportin
 2. `npm install && npm run dev`
 
 © Copyright 2020 Massachusetts Institute of Technology
+
+
+### Citation
+Please cite our paper if you use the code or data in this repository.
+
+```
+@inproceedings{song2021online,
+  title={Online mingling: supporting ad hoc, private conversations at virtual conferences},
+  author={Song, Jaeyoon and Riedl, Christoph and Malone, Thomas W},
+  booktitle={Proceedings of the 2021 CHI Conference on Human Factors in Computing Systems},
+  pages={1--10},
+  year={2021}
+}
+```
